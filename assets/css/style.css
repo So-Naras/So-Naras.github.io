@@ -210,7 +210,7 @@ h6 {
   padding: 8px 20px;
   margin-left: 30px;
   border-radius: 4px;
-  color: #9b95c9;
+  color: #fff;
 }
 
 .navbar .getstarted:hover,
@@ -448,7 +448,7 @@ h6 {
 }
 
 #hero .btn-get-started:hover {
-  background: #fff;
+  background: #9b95c9;
 }
 
 #hero .icon-boxes {
@@ -1501,7 +1501,7 @@ section {
   position: absolute;
   right: 0;
   left: 20px;
-  color: #87c1ea;
+  color: #9b95c9;
 }
 
 .faq .faq-list .icon-show,
