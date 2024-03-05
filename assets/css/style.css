@@ -137,6 +137,7 @@ h6 {
   font-weight: 300;
   letter-spacing: 0.5px;
   font-family: "Poppins", sans-serif;
+  justify-content: space-between;
 }
 
 #header .logo a {
@@ -144,7 +145,6 @@ h6 {
 }
 
 #header .logo img {
-  justify-content: space-between;
   max-height: 50px;
   border-radius: 30px;
 }
