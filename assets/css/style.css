@@ -201,12 +201,12 @@ h6 {
 .navbar .active,
 .navbar .active:focus,
 .navbar li:hover>a {
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 .navbar .getstarted,
 .navbar .getstarted:focus {
-  background: #2487ce;
+  background: #b9b1fe;
   padding: 8px 20px;
   margin-left: 30px;
   border-radius: 4px;
@@ -251,7 +251,7 @@ h6 {
 .navbar .dropdown ul a:hover,
 .navbar .dropdown ul .active:hover,
 .navbar .dropdown ul li:hover>a {
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 .navbar .dropdown:hover>ul {
@@ -350,7 +350,7 @@ h6 {
 .navbar-mobile a:hover,
 .navbar-mobile .active,
 .navbar-mobile li:hover>a {
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 .navbar-mobile .getstarted,
@@ -385,7 +385,7 @@ h6 {
 .navbar-mobile .dropdown ul a:hover,
 .navbar-mobile .dropdown ul .active:hover,
 .navbar-mobile .dropdown ul li:hover>a {
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 .navbar-mobile .dropdown>.dropdown-active {
@@ -444,7 +444,7 @@ h6 {
   transition: 0.5s;
   margin-top: 30px;
   color: #fff;
-  background: #2487ce;
+  background: #b9b1fe;
 }
 
 #hero .btn-get-started:hover {
@@ -490,7 +490,7 @@ h6 {
   transition: all 0.3s ease-in-out;
   font-size: 36px;
   line-height: 1;
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 #hero .icon-box:hover {
@@ -498,7 +498,7 @@ h6 {
 }
 
 #hero .icon-box:hover .title a {
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 @media (min-width: 1024px) {
@@ -588,7 +588,7 @@ section {
   left: 0;
   top: 2px;
   font-size: 20px;
-  color: #2487ce;
+  color: #b9b1fe;
   line-height: 1;
 }
 
@@ -606,14 +606,14 @@ section {
   border-radius: 5px;
   transition: 0.3s;
   line-height: 1;
-  color: #2487ce;
+  color: #b9b1fe;
   animation-delay: 0.8s;
   margin-top: 6px;
-  border: 2px solid #2487ce;
+  border: 2px solid #b9b1fe;
 }
 
 .about .content .btn-learn-more:hover {
-  background: #2487ce;
+  background: #b9b1fe;
   color: #fff;
   text-decoration: none;
 }
@@ -674,7 +674,7 @@ section {
 
 .about-video .content ul i {
   font-size: 24px;
-  color: #2487ce;
+  color: #b9b1fe;
   position: absolute;
   left: 0;
   top: -2px;
@@ -687,7 +687,7 @@ section {
 .about-video .play-btn {
   width: 94px;
   height: 94px;
-  background: radial-gradient(#2487ce 50%, rgba(36, 135, 206, 0.4) 52%);
+  background: radial-gradient(#b9b1fe 50%, rgba(36, 135, 206, 0.4) 52%);
   border-radius: 50%;
   display: block;
   position: absolute;
@@ -730,7 +730,7 @@ section {
 }
 
 .about-video .play-btn:hover::after {
-  border-left: 15px solid #2487ce;
+  border-left: 15px solid #b9b1fe;
   transform: scale(20);
 }
 
@@ -874,11 +874,11 @@ section {
   height: 12px;
   background-color: #fff;
   opacity: 1;
-  border: 1px solid #2487ce;
+  border: 1px solid #b9b1fe;
 }
 
 .testimonials .swiper-pagination .swiper-pagination-bullet-active {
-  background-color: #2487ce;
+  background-color: #b9b1fe;
 }
 
 /*--------------------------------------------------------------
@@ -1018,7 +1018,7 @@ section {
 # Cta
 --------------------------------------------------------------*/
 .cta {
-  background: #2487ce;
+  background: #b9b1fe;
   background-size: cover;
   padding: 60px 0;
 }
@@ -1049,7 +1049,7 @@ section {
 
 .cta .cta-btn:hover {
   background: #fff;
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 /*--------------------------------------------------------------
@@ -1083,7 +1083,7 @@ section {
 
 .portfolio #portfolio-flters li:hover,
 .portfolio #portfolio-flters li.filter-active {
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 .portfolio #portfolio-flters li:last-child {
@@ -1228,11 +1228,11 @@ section {
   height: 12px;
   background-color: #fff;
   opacity: 1;
-  border: 1px solid #2487ce;
+  border: 1px solid #b9b1fe;
 }
 
 .portfolio-details .portfolio-details-slider .swiper-pagination .swiper-pagination-bullet-active {
-  background-color: #2487ce;
+  background-color: #b9b1fe;
 }
 
 .portfolio-details .portfolio-info {
@@ -1312,7 +1312,7 @@ section {
 }
 
 .team .member .social a:hover {
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 .team .member .social i {
@@ -1374,7 +1374,7 @@ section {
 
 .pricing .box h4 {
   font-size: 42px;
-  color: #2487ce;
+  color: #b9b1fe;
   font-weight: 500;
   font-family: "Open Sans", sans-serif;
   margin-bottom: 20px;
@@ -1419,23 +1419,23 @@ section {
   display: inline-block;
   padding: 10px 40px;
   border-radius: 4px;
-  color: #2487ce;
+  color: #b9b1fe;
   transition: none;
   font-size: 14px;
   font-weight: 400;
   font-family: "Raleway", sans-serif;
   font-weight: 600;
   transition: 0.3s;
-  border: 2px solid #2487ce;
+  border: 2px solid #b9b1fe;
 }
 
 .pricing .box .btn-buy:hover {
-  background: #2487ce;
+  background: #b9b1fe;
   color: #fff;
 }
 
 .pricing .featured {
-  background: #2487ce;
+  background: #b9b1fe;
 }
 
 .pricing .featured h3,
@@ -1458,7 +1458,7 @@ section {
 
 .pricing .featured .btn-buy:hover {
   background: #fff;
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 /*--------------------------------------------------------------
@@ -1526,7 +1526,7 @@ section {
 }
 
 .faq .faq-list a.collapsed:hover {
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 .faq .faq-list a.collapsed .icon-show {
@@ -1553,7 +1553,7 @@ section {
 
 .contact .info i {
   font-size: 20px;
-  color: #2487ce;
+  color: #b9b1fe;
   float: left;
   width: 44px;
   height: 44px;
@@ -1588,7 +1588,7 @@ section {
 .contact .info .email:hover i,
 .contact .info .address:hover i,
 .contact .info .phone:hover i {
-  background: #2487ce;
+  background: #b9b1fe;
   color: #fff;
 }
 
@@ -1652,7 +1652,7 @@ section {
 
 .contact .php-email-form input:focus,
 .contact .php-email-form textarea:focus {
-  border-color: #2487ce;
+  border-color: #b9b1fe;
 }
 
 .contact .php-email-form input {
@@ -1664,7 +1664,7 @@ section {
 }
 
 .contact .php-email-form button[type=submit] {
-  background: #2487ce;
+  background: #b9b1fe;
   border: 0;
   padding: 10px 30px;
   color: #fff;
@@ -1796,7 +1796,7 @@ section {
 
 #footer .footer-top .footer-links ul i {
   padding-right: 2px;
-  color: #2487ce;
+  color: #b9b1fe;
   font-size: 18px;
   line-height: 1;
 }
@@ -1820,7 +1820,7 @@ section {
 
 #footer .footer-top .footer-links ul a:hover {
   text-decoration: none;
-  color: #2487ce;
+  color: #b9b1fe;
 }
 
 #footer .footer-newsletter {
@@ -1860,7 +1860,7 @@ section {
   background: none;
   font-size: 16px;
   padding: 0 20px 2px 20px;
-  background: #2487ce;
+  background: #b9b1fe;
   color: #fff;
   transition: 0.3s;
   border-radius: 0 5px 5px 0;
@@ -1880,7 +1880,7 @@ section {
 #footer .social-links a {
   font-size: 18px;
   display: inline-block;
-  background: #2487ce;
+  background: #b9b1fe;
   color: #fff;
   line-height: 1;
   padding: 8px 0;
