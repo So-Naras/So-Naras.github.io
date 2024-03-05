@@ -20,7 +20,7 @@ a {
 }
 
 a:hover {
-  color: #fff;
+  color: #9b95c9;
   text-decoration: none;
 }
 
@@ -210,13 +210,13 @@ h6 {
   padding: 8px 20px;
   margin-left: 30px;
   border-radius: 4px;
-  color: #fff;
+  color: #9b95c9;
 }
 
 .navbar .getstarted:hover,
 .navbar .getstarted:focus:hover {
   color: #fff;
-  background: #fff;
+  background: #9b95c9;
 }
 
 .navbar .dropdown ul {
