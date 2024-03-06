@@ -1004,14 +1004,16 @@
   <!-- Vendor JS Files -->
   <script>
   function toggleEllipsis(element) {
-      var fullText = element.parentNode.querySelector(".full-text");
-      if (fullText.style.display === "none") {
-          fullText.style.display = "block";
-          element.textContent = "Read less";
-      } else {
-          fullText.style.display = "none";
-          element.textContent = "Read more";
-      }
+    var fullText = element.parentNode.querySelector(".full-text");
+    if (fullText.style.maxHeight && fullText.style.maxHeight !== "0px") {
+        fullText.style.maxHeight = "0px"; // Collapse the section
+        element.textContent = "Read more";
+    } else {
+        // Set max-height to a specific value that can contain the content.
+        // You might need to adjust this value based on the actual content size or use a script to dynamically calculate it.
+        fullText.style.maxHeight = fullText.scrollHeight + "px"; // Expand the section
+        element.textContent = "Read less";
+    }
   }
   </script>
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
