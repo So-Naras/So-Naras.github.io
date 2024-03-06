@@ -1350,11 +1350,29 @@ section {
   opacity: 1;
 }
 
-.team .collapsibleSection {
-    /* Styles for your collapsible section */
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin-top: 5px;
+.team .member-info p {
+    /* Style for the paragraph containing the summary and 'Read more' ellipsis */
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.team .ellipsis {
+    /* Style for the 'Read more/Read less' clickable element */
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.team .full-text {
+    /* Style for the hidden full text that will be shown when 'Read more' is clicked */
+    display: none; /* Initially hidden, will be toggled by JavaScript */
+    margin-top: 1rem;
+}
+
+/* Optional: Add a transition for smoother expansion/collapse (this requires adjustments in JavaScript to work properly with height transitions) */
+.team .full-text {
+    transition: max-height 0.5s ease-out;
+    overflow: hidden;
 }
 
 /*--------------------------------------------------------------
