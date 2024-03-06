@@ -1363,11 +1363,11 @@ section {
     text-decoration: underline;
 }
 
-/*.team .full-text {
-    /* Style for the hidden full text that will be shown when 'Read more' is clicked */
-    /*display: none; /* Initially hidden, will be toggled by JavaScript */
-    /*margin-top: 1rem;
-/*} 
+.team .full-text {
+    /*Style for the hidden full text that will be shown when 'Read more' is clicked */
+    display: none; /* Initially hidden, will be toggled by JavaScript */
+    margin-top: 1rem;
+} 
 /* Optional: Add a transition for smoother expansion/collapse (this requires adjustments in JavaScript to work properly with height transitions) */
 .team .full-text {
     /*max-height: 10;*/
