@@ -1370,7 +1370,7 @@ section {
 /*} 
 /* Optional: Add a transition for smoother expansion/collapse (this requires adjustments in JavaScript to work properly with height transitions) */
 .team .full-text {
-    max-height: 10;
+    /*max-height: 10;*/
     transition: max-height 0.5s ease-out;
     overflow: hidden;
 }
