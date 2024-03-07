@@ -45,7 +45,7 @@
 
       <!---<h1 class="logo"><a href="index.html">So-Naras</a></h1> -->
       <!-- Uncomment below if you prefer to use an image logo -->
-      <a href="sonaras.org" class="logo"><img src="assets/img/IMG_3865.png" alt="" class="grow-on-hover"></a>
+      <a class="logo" id="logoReload"><img src="assets/img/IMG_3865.png" alt="" class="grow-on-hover"></a>
 
       <nav id="navbar" class="navbar">
         <ul>
@@ -1030,6 +1030,12 @@
         element.textContent = "Read less";
     }
   }
+  </script>
+  <script>
+  document.getElementById('logoReload').addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent the default anchor action
+      window.location.reload();
+  });
   </script>
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
