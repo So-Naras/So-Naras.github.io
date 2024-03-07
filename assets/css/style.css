@@ -156,6 +156,15 @@ h6 {
   }
 }
 
+#header .grow-on-hover {
+  transition: transform 0.5s ease; /* Smoothly transition the transform property */
+  display: block;
+}
+
+#header .grow-on-hover:hover {
+    transform: scale(2); /* Grow the image to 110% of its size */
+}
+
 /*--------------------------------------------------------------
 # Navigation Menu
 --------------------------------------------------------------*/
