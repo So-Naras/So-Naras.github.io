@@ -186,6 +186,9 @@ h6 {
 
 .navbar li {
   position: relative;
+  margin-right: 10px; /* Add spacing between chips */
+  border-radius: 20px; /* Rounded corners for chip effect */
+  background-color: #f0f0f0; 
 }
 
 .navbar a,
@@ -193,11 +196,13 @@ h6 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0 10px 30px;
+  padding: 10px 20px; /* Increased padding for visual appearance of the chip */
   font-size: 14px;
   color: #16507b;
   white-space: nowrap;
   transition: 0.3s;
+  border-radius: 20px; /* Ensure the <a> inherits the rounded corners */
+  background-color: transparent;
 }
 
 .navbar a i,
@@ -213,7 +218,7 @@ h6 {
 .navbar .active,
 .navbar .active:focus,
 .navbar li:hover>a {
-  color: #b9b1fe;
+  background-color: #e0e0e0;
 }
 
 .navbar .getstarted,
