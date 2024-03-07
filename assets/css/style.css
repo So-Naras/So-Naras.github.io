@@ -118,7 +118,7 @@ h6 {
 --------------------------------------------------------------*/
 #header {
   transition: all 0.5s;
-  background: linear-gradient(to right, #dda5ff, #9f00ff);
+  background: linear-gradient(to left, #dda5ff, #9f00ff);
   z-index: 997;
   padding: 15px 0;
   /*border-bottom: 1px solid #e6f2fb;*/
