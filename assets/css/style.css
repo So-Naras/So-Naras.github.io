@@ -192,7 +192,7 @@ h6 {
 }
 
 .navbar a:not(:nth-child(5)),
-.navbar a:focus:not(:nth-child(5)) {
+.navbar a:not(:nth-child(5)):focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
