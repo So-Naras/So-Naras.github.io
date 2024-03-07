@@ -173,7 +173,6 @@ h6 {
 */
 .navbar {
   padding: 0;
-  transition: transform 0.5s ease;
 }
 
 .navbar ul {
@@ -197,8 +196,7 @@ h6 {
   font-size: 14px;
   color: #16507b;
   white-space: nowrap;
-  /*transition: 0.3s;*/
-  transition: transform 0.5s ease;
+  transition: 0.3s;
 }
 
 .navbar a i,
@@ -208,16 +206,13 @@ h6 {
   margin-left: 5px;
 }
 
-.navbar:hover {
-  transform: scale(2); /* Grow the navbar on hover */
-}
+
 
 .navbar a:hover,
 .navbar .active,
 .navbar .active:focus,
 .navbar li:hover>a {
   color: #b9b1fe;
-  transform: scale(2);
 }
 
 .navbar .getstarted,
