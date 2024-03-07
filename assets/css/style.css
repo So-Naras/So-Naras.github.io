@@ -184,15 +184,15 @@ h6 {
   align-items: center;
 }
 
-.navbar li {
+.navbar li:not([href="#cta"]) {
   position: relative;
   margin-right: 10px; /* Add spacing between chips */
   border-radius: 20px; /* Rounded corners for chip effect */
   background-color: #f0f0f0; 
 }
 
-.navbar a,
-.navbar a:focus {
+.navbar a:not([href="#cta"]),
+.navbar a:not([href="#cta"]):focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -214,10 +214,10 @@ h6 {
 
 
 
-.navbar a:hover,
-.navbar .active,
-.navbar .active:focus,
-.navbar li:hover>a {
+.navbar a:not([href="#cta"]):hover,
+.navbar .active:not([href="#cta"]),
+.navbar .active:not([href="#cta"]):focus,
+.navbar li:hover>a:not([href="#cta"]) {
   background-color: #e0e0e0;
 }
 
