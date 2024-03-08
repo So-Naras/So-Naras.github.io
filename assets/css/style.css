@@ -119,7 +119,7 @@ h6 {
 #header {
   transition: all 0.5s;
   /*background: linear-gradient(to right, #b437ff, #00d4ff);*/
-  background: linear-gradient(to right, #b9b1fe, #00d4ff);
+  background: linear-gradient(to right, #b9b1fe, #ebe8ff);
   z-index: 997;
   padding: 15px 0;
   /*border-bottom: 1px solid #e6f2fb;*/
@@ -218,11 +218,11 @@ h6 {
 .navbar li:not(:nth-child(5)) a:hover,
 .navbar li:not(:nth-child(5)) .active,
 .navbar li:not(:nth-child(5)) .active:focus {
-  background-color: #ebe8ff;
+  background-color: #e0dcfa;
 }
 
 .navbar li:hover > a:not(:nth-child(5)) {
-  background-color: #ebe8ff;
+  background-color: #e0dcfa;
 }
 
 .navbar .getstarted,
