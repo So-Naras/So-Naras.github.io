@@ -223,6 +223,7 @@ h6 {
 
 .navbar .getstarted,
 .navbar .getstarted:focus {
+  z-index: 100;
   background: #b9b1fe;
   padding: 8px 20px;
   margin-left: 30px;
