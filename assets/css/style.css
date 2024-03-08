@@ -118,7 +118,8 @@ h6 {
 --------------------------------------------------------------*/
 #header {
   transition: all 0.5s;
-  background: linear-gradient(to right, #b437ff, #00d4ff);
+  /*background: linear-gradient(to right, #b437ff, #00d4ff);*/
+  background: linear-gradient(to right, #b9b1fe, #00d4ff);
   z-index: 997;
   padding: 15px 0;
   /*border-bottom: 1px solid #e6f2fb;*/
@@ -188,7 +189,7 @@ h6 {
   position: relative;
   margin-right: 10px; /* Add spacing between chips */
   border-radius: 20px; /* Rounded corners for chip effect */
-  background-color: #f0f0f0; 
+  background-color: #FFFFFF; 
 }
 
 .navbar li:not(:nth-child(5)) a,
