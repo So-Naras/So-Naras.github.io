@@ -191,8 +191,8 @@ h6 {
   background-color: #f0f0f0; 
 }
 
-.navbar a:not(:nth-child(5)),
-.navbar a:not(:nth-child(5)):focus {
+.navbar li:not(:nth-child(5)) a,
+.navbar li:not(:nth-child(5)) a:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -214,10 +214,13 @@ h6 {
 
 
 
-.navbar a:not(:nth-child(5)):hover,
-.navbar .active:not(:nth-child(5)),
-.navbar .active:not(:nth-child(5)):focus,
-.navbar li:hover>a:not(:nth-child(5)) {
+.navbar li:not(:nth-child(5)) a:hover,
+.navbar li:not(:nth-child(5)) .active,
+.navbar li:not(:nth-child(5)) .active:focus {
+  background-color: #e0e0e0;
+}
+
+.navbar li:hover > a:not(:nth-child(5)) {
   background-color: #e0e0e0;
 }
 
