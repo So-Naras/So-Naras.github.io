@@ -185,25 +185,20 @@ h6 {
   align-items: center;
 }
 
-.navbar li:not(:nth-child(5)) {
+.navbar li {
   position: relative;
-  margin-right: 10px; /* Add spacing between chips */
-  border-radius: 20px; /* Rounded corners for chip effect */
-  background-color: #FFFFFF; 
 }
 
-.navbar li:not(:nth-child(5)) a,
-.navbar li:not(:nth-child(5)) a:focus {
+.navbar a,
+.navbar a:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px; /* Increased padding for visual appearance of the chip */
+  padding: 10px 0 10px 30px;
   font-size: 14px;
   color: #16507b;
   white-space: nowrap;
   transition: 0.3s;
-  border-radius: 20px; /* Ensure the <a> inherits the rounded corners */
-  background-color: transparent;
 }
 
 .navbar a i,
@@ -213,21 +208,15 @@ h6 {
   margin-left: 5px;
 }
 
-
-
-.navbar li:not(:nth-child(5)) a:hover,
-.navbar li:not(:nth-child(5)) .active,
-.navbar li:not(:nth-child(5)) .active:focus {
-  background-color: #e0dcfa;
-}
-
-.navbar li:hover > a:not(:nth-child(5)) {
-  background-color: #e0dcfa;
+.navbar a:hover,
+.navbar .active,
+.navbar .active:focus,
+.navbar li:hover>a {
+  color: #b9b1fe;
 }
 
 .navbar .getstarted,
 .navbar .getstarted:focus {
-  z-index: 100;
   background: #b9b1fe;
   padding: 8px 20px;
   margin-left: 30px;
