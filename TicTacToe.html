@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tic-Tac-Toe Game</title>
+    <style>
+        /* General Styles */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50;
+        }
+
+        h1 {
+            color: #ecf0f1;
+            text-align: center;
+            margin: 20px 0 10px 0;
+            animation: fadeInDown 1s;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* Scoreboard Styles */
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ecf0f1;
+            margin-bottom: 20px;
+            font-size: 20px;
+            animation: fadeInDown 1s;
+        }
+
+        .scoreboard .player {
+            background-color: #34495e;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            min-width: 150px;
+            justify-content: center;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .scoreboard .player-name {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .scoreboard .player-score {
+            font-size: 24px;
+        }
+
+        .scoreboard .score-increment {
+            position: absolute;
+            top: -20px;
+            right: 10px;
+            font-size: 16px;
+            color: #2ecc71;
+            opacity: 0;
+            animation: scoreIncrement 1s forwards;
+        }
+
+        @keyframes scoreIncrement {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .blue {
+            background-color: #3498db !important;
+        }
+
+        .winner {
+            background-color: #2ecc71 !important;
+            /* Green */
+        }
+
+        .loser {
+            background-color: #e74c3c !important;
+            /* Red */
+        }
+
+        .tied {
+            background-color: #f1c40f !important;
+            /* Yellow */
+        }
+
+        /* Game Board Styles */
+        .game {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #34495e;
+            border-radius: 10px;
+            font-size: 64px;
+            color: transparent;
+            /* Start with transparent text */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .cell.flipped {
+            animation: flip 1s forwards;
+        }
+
+        @keyframes flip {
+            0% {
+                transform: rotateY(0deg);
+            }
+
+            25% {
+                transform: rotateY(360deg);
+            }
+
+            50% {
+                transform: rotateY(720deg);
+            }
+
+            75% {
+                transform: rotateY(1080deg);
+            }
+
+            100% {
+                transform: rotateY(1440deg);
+            }
+        }
+
+        .cell.show-letter {
+            color: #e74c3c;
+            /* For X */
+        }
+
+        .cell.O.show-letter {
+            color: #3498db;
+            /* For O */
+        }
+
+        .cell.win {
+            background-color: #2ecc71 !important;
+            /* Green color for win */
+        }
+
+        .cell.draw {
+            background-color: #f1c40f !important;
+            /* Yellow color for draw */
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #2c3e50;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 30px;
+            border: none;
+            width: 80%;
+            max-width: 400px;
+            color: #ecf0f1;
+            text-align: center;
+            border-radius: 10px;
+            animation: modalFadeIn 0.5s;
+        }
+
+        .modal-content .winner-symbol {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: scaleUp 0.5s;
+        }
+
+        .modal-content button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: #ecf0f1;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: #2ecc71;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="scoreboard">
+            <div class="player" id="player1">
+                <span class="player-name">Player 1 (X): </span>
+                <span class="player-score" id="scoreX">0</span>
+            </div>
+            <div class="player" id="player2">
+                <span class="player-name">Player 2 (O): </span>
+                <span class="player-score" id="scoreO">0</span>
+            </div>
+        </div>
+        <div class="game" id="game">
+            <!-- Generate 9 cells -->
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+        </div>
+        <!-- Game Over Modal -->
+        <div id="gameOverModal" class="modal">
+            <div class="modal-content">
+                <div class="winner-symbol" id="winnerSymbol"></div>
+                <span id="gameOverMessage" style="font-size: 24px;"></span>
+                <br>
+                <button id="closeModalButton">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+    <script>
+        const cells = document.querySelectorAll('[data-cell]');
+        let isCircleTurn;
+        let scoreX = 0;
+        let scoreO = 0;
+        const WINNING_COMBINATIONS = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        const gameOverModal = document.getElementById('gameOverModal');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        const closeModalButton = document.getElementById('closeModalButton');
+        const winnerSymbolElement = document.getElementById('winnerSymbol');
+
+        const scoreXElement = document.getElementById('scoreX');
+        const scoreOElement = document.getElementById('scoreO');
+        const player1Element = document.getElementById('player1');
+        const player2Element = document.getElementById('player2');
+
+        startGame();
+
+        function startGame() {
+            isCircleTurn = false;
+            cells.forEach(cell => {
+                cell.classList.remove('X', 'O', 'win', 'draw', 'flipped', 'show-letter');
+                cell.innerHTML = '';
+                cell.addEventListener('click', handleClick, { once: true });
+            });
+            updateScoreboard();
+        }
+
+        function handleClick(e) {
+            const cell = e.currentTarget;
+            const currentClass = isCircleTurn ? 'O' : 'X';
+
+            // Add the 'flipped' class to start the flip animation
+            cell.classList.add('flipped');
+
+            // Remove the event listener so it can't be clicked again
+            cell.removeEventListener('click', handleClick);
+
+            // After the flip animation completes (1s), place the mark
+            setTimeout(() => {
+                placeMark(cell, currentClass);
+
+                if (checkWin(currentClass)) {
+                    endGame(false);
+                } else if (isDraw()) {
+                    endGame(true);
+                } else {
+                    swapTurns();
+                }
+            }, 1000);
+        }
+
+        function placeMark(cell, currentClass) {
+            cell.innerHTML = currentClass;
+            cell.classList.add('show-letter');
+            cell.classList.add(currentClass);
+        }
+
+        function swapTurns() {
+            isCircleTurn = !isCircleTurn;
+        }
+
+        function checkWin(currentClass) {
+            return WINNING_COMBINATIONS.some(combination => {
+                return combination.every(index => {
+                    return cells[index].classList.contains(currentClass);
+                });
+            });
+        }
+
+        function isDraw() {
+            return [...cells].every(cell => {
+                return cell.classList.contains('X') || cell.classList.contains('O');
+            });
+        }
+
+        function endGame(draw) {
+            if (draw) {
+                gameOverMessage.textContent = "It's a Draw!";
+                winnerSymbolElement.textContent = '';
+                highlightDraw();
+                showScoreIncrement(0, 0);
+                updateScoreboard();
+                showModal(false);
+            } else {
+                const winner = isCircleTurn ? 'Player 2 (O)' : 'Player 1 (X)';
+                gameOverMessage.textContent = `${winner} Wins!`;
+                const winningSymbol = isCircleTurn ? 'O' : 'X';
+                winnerSymbolElement.textContent = winningSymbol;
+                winnerSymbolElement.style.color = isCircleTurn ? '#3498db' : '#e74c3c';
+                highlightWin(winningSymbol);
+                showScoreIncrement(winningSymbol);
+                updateScoreboard();
+                showModal(true, isCircleTurn ? '#3498db' : '#e74c3c');
+            }
+            cells.forEach(cell => {
+                cell.removeEventListener('click', handleClick);
+            });
+        }
+
+        function showScoreIncrement(winnerSymbol) {
+            if (winnerSymbol === 'X') {
+                const increment = document.createElement('div');
+                increment.textContent = '+1';
+                increment.classList.add('score-increment');
+                player1Element.appendChild(increment);
+                setTimeout(() => {
+                    player1Element.removeChild(increment);
+                    scoreX++;
+                    scoreXElement.textContent = scoreX;
+                }, 1000);
+            } else if (winnerSymbol === 'O') {
+                const increment = document.createElement('div');
+                increment.textContent = '+1';
+                increment.classList.add('score-increment');
+                player2Element.appendChild(increment);
+                setTimeout(() => {
+                    player2Element.removeChild(increment);
+                    scoreO++;
+                    scoreOElement.textContent = scoreO;
+                }, 1000);
+            } else {
+                const increment1 = document.createElement('div');
+                increment1.textContent = '+0';
+                increment1.classList.add('score-increment');
+                player1Element.appendChild(increment1);
+                const increment2 = document.createElement('div');
+                increment2.textContent = '+0';
+                increment2.classList.add('score-increment');
+                player2Element.appendChild(increment2);
+                setTimeout(() => {
+                    player1Element.removeChild(increment1);
+                    player2Element.removeChild(increment2);
+                }, 1000);
+            }
+        }
+
+        function updateScoreboard() {
+            player1Element.classList.remove('winner', 'loser', 'tied', 'blue');
+            player2Element.classList.remove('winner', 'loser', 'tied', 'blue');
+
+            if (scoreX === 0 && scoreO === 0) {
+                player1Element.classList.add('blue');
+                player2Element.classList.add('blue');
+            } else if (scoreX > scoreO) {
+                player1Element.classList.add('winner');
+                player2Element.classList.add('loser');
+            } else if (scoreO > scoreX) {
+                player2Element.classList.add('winner');
+                player1Element.classList.add('loser');
+            } else {
+                player1Element.classList.add('tied');
+                player2Element.classList.add('tied');
+            }
+        }
+
+        function highlightWin(currentClass) {
+            WINNING_COMBINATIONS.forEach(combination => {
+                if (combination.every(index => cells[index].classList.contains(currentClass))) {
+                    combination.forEach(index => {
+                        cells[index].classList.add('win');
+                    });
+                }
+            });
+        }
+
+        function highlightDraw() {
+            cells.forEach(cell => {
+                cell.classList.add('draw');
+            });
+        }
+
+        function showModal(confettiEnabled, confettiColor) {
+            gameOverModal.style.display = "block";
+            if (confettiEnabled) {
+                // Launch confetti with specified color
+                confetti({
+                    particleCount: 200,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#ffffff', confettiColor],
+                    scalar: 1.2,
+                    shapes: ['circle'],
+                });
+            }
+        }
+
+        closeModalButton.addEventListener('click', () => {
+            gameOverModal.style.display = "none";
+            startGame();
+        });
+    </script>
+</body>
+
+</html>

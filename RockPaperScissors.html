@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rock-Paper-Scissors Game</title>
+    <style>
+        /* General Styles */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e272e;
+            color: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Button Styles */
+        .btn {
+            background-color: #2f3640;
+            color: #ecf0f1;
+            padding: 15px 25px;
+            margin: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            min-width: 150px;
+        }
+
+        .btn:hover {
+            background-color: #40739e;
+            transform: scale(1.05);
+        }
+
+        .btn-choice {
+            width: 100px;
+            height: 100px;
+            font-size: 50px;
+            border-radius: 10px;
+            margin: 10px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+            background-color: #2f3640;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-choice:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-disabled {
+            background-color: #7f8c8d !important;
+            cursor: not-allowed;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Hidden Elements */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Fight Animation Styles */
+        .fight-animation {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .fighter {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fighter-left {
+            left: -120px;
+            animation: moveRight 2s forwards;
+        }
+
+        .fighter-right {
+            right: -120px;
+            animation: moveLeft 2s forwards;
+        }
+
+        @keyframes moveRight {
+            0% {
+                left: -120px;
+            }
+
+            50% {
+                left: calc(50% - 150px);
+            }
+
+            100% {
+                left: calc(50% - 110px);
+            }
+        }
+
+        @keyframes moveLeft {
+            0% {
+                right: -120px;
+            }
+
+            50% {
+                right: calc(50% - 150px);
+            }
+
+            100% {
+                right: calc(50% - 110px);
+            }
+        }
+
+        /* Scoreboard Styles */
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .scoreboard .player {
+            background-color: #34495e;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            min-width: 150px;
+            justify-content: center;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+
+        .scoreboard .player-name {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .scoreboard .player-score {
+            font-size: 24px;
+        }
+
+        .scoreboard .score-increment {
+            position: absolute;
+            top: -20px;
+            right: 10px;
+            font-size: 16px;
+            color: #2ecc71;
+            opacity: 0;
+            animation: scoreIncrement 1s forwards;
+        }
+
+        @keyframes scoreIncrement {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .blue {
+            background-color: #3498db !important;
+        }
+
+        .winner {
+            background-color: #2ecc71 !important;
+            /* Green */
+        }
+
+        .loser {
+            background-color: #e74c3c !important;
+            /* Red */
+        }
+
+        .tied {
+            background-color: #f1c40f !important;
+            /* Yellow */
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            background-color: #2f3640;
+            margin: 15% auto;
+            padding: 20px;
+            border: none;
+            width: 80%;
+            max-width: 400px;
+            color: #ecf0f1;
+            text-align: center;
+            border-radius: 10px;
+            animation: fadeIn 0.5s;
+        }
+
+        .modal-content button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: #ecf0f1;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: #2ecc71;
+        }
+
+        /* Sliding Animations */
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 1s forwards;
+        }
+
+        .slide-in-right {
+            animation: slideInRight 1s forwards;
+        }
+
+        /* Centering Elements */
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        /* Choice Buttons Container */
+        #choices {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Rock-Paper-Scissors</h1>
+
+        <!-- Round Selection -->
+        <div id="roundSelection">
+            <p>Select Game Mode:</p>
+            <button class="btn" onclick="startGame(1)">Single Round</button>
+            <button class="btn" onclick="startGame(3)">Best of 3</button>
+        </div>
+
+        <!-- Scoreboard -->
+        <div class="scoreboard hidden" id="scoreboard">
+            <div class="player" id="player1">
+                <span class="player-name">Player 1:</span>
+                <span class="player-score" id="score1">0</span>
+            </div>
+            <div class="player" id="player2">
+                <span class="player-name">Player 2:</span>
+                <span class="player-score" id="score2">0</span>
+            </div>
+        </div>
+
+        <!-- Player Turn -->
+        <div id="playerTurn" class="hidden">
+            <p id="turnMessage"></p>
+            <div id="choices">
+                <button class="btn-choice" onclick="makeChoice('rock')">🪨</button>
+                <button class="btn-choice" onclick="makeChoice('paper')">📄</button>
+                <button class="btn-choice" onclick="makeChoice('scissors')">✂️</button>
+            </div>
+            <button class="btn" id="nextPlayerButton" onclick="nextPlayer()" style="display: none;">Next Player</button>
+        </div>
+
+        <!-- Show Choices -->
+        <div id="showChoices" class="hidden">
+            <div id="choiceContainer" class="center">
+                <div id="playerChoiceDisplay" style="font-size: 50px;"></div>
+            </div>
+        </div>
+
+        <!-- Fight Animation -->
+        <div id="fightAnimation" class="hidden">
+            <div class="fight-animation">
+                <div class="fighter fighter-left" id="fighter1"></div>
+                <div class="fighter fighter-right" id="fighter2"></div>
+            </div>
+        </div>
+
+        <!-- Notification Modal -->
+        <div id="notificationModal" class="modal"> <!-- Added class "modal" -->
+            <div id="notificationContent" class="modal-content"> <!-- Added class "modal-content" -->
+                <h2 id="notificationMessage"></h2>
+                <button onclick="closeNotification()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="gameOverModal" class="modal">
+            <div class="modal-content">
+                <h2 id="gameOverMessage"></h2>
+                <button onclick="restartGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+    <script>
+        let totalRounds = 1;
+        let currentRound = 1;
+        let scores = { 1: 0, 2: 0 };
+        let choices = { 1: '', 2: '' };
+        let currentPlayer = 1;
+
+        const player1Element = document.getElementById('player1');
+        const player2Element = document.getElementById('player2');
+        const score1Element = document.getElementById('score1');
+        const score2Element = document.getElementById('score2');
+
+
+        function startGame(rounds) {
+            totalRounds = rounds;
+            currentRound = 1;
+            scores = { 1: 0, 2: 0 };
+            score1Element.textContent = '0';
+            score2Element.textContent = '0';
+            document.getElementById('roundSelection').classList.add('hidden');
+            document.getElementById('scoreboard').classList.remove('hidden');
+            document.getElementById('playerTurn').classList.remove('hidden');
+            document.getElementById('turnMessage').textContent = 'Player 1, make your choice and pass the device.';
+            currentPlayer = 1;
+            choices = { 1: '', 2: '' };
+            document.getElementById('nextPlayerButton').style.display = 'none';
+            updateScoreboard();
+        }
+
+        function makeChoice(choice) {
+            choices[currentPlayer] = choice;
+            if (currentPlayer === 1) {
+                // Hide choices and show next player button
+                document.getElementById('choices').style.display = 'none';
+                document.getElementById('nextPlayerButton').style.display = 'inline-block';
+            } else {
+                // Proceed to show choices
+                document.getElementById('playerTurn').classList.add('hidden');
+                document.getElementById('showChoices').classList.remove('hidden');
+                currentStage = 'showPlayer1Choice';
+                showPlayerChoices();
+            }
+        }
+
+        function nextPlayer() {
+            currentPlayer = 2;
+            document.getElementById('turnMessage').textContent = 'Player 2, make your choice.';
+            document.getElementById('choices').style.display = 'flex';
+            document.getElementById('nextPlayerButton').style.display = 'none';
+        }
+
+        let currentStage = 'showPlayer1Choice';
+
+        function showPlayerChoices() {
+            const emojis = {
+                'rock': '🪨',
+                'paper': '📄',
+                'scissors': '✂️'
+            };
+            const playerChoiceDisplay = document.getElementById('playerChoiceDisplay');
+
+            if (currentStage === 'showPlayer1Choice') {
+                playerChoiceDisplay.textContent = `${emojis[choices[1]]}`;
+                playerChoiceDisplay.className = 'slide-in-left';
+                setTimeout(() => {
+                    currentStage = 'showPlayer2Choice';
+                    showPlayerChoices();
+                }, 1000); // Wait 1 second before showing the next choice
+            } else if (currentStage === 'showPlayer2Choice') {
+                playerChoiceDisplay.textContent = `${emojis[choices[2]]}`;
+                playerChoiceDisplay.className = 'slide-in-right';
+                setTimeout(() => {
+                    currentStage = 'fightAnimation';
+                    proceedToFightAnimation();
+                }, 1000); // Wait 1 second before proceeding to fight animation
+            }
+        }
+
+        function proceedToFightAnimation() {
+            document.getElementById('showChoices').classList.add('hidden');
+            document.getElementById('fightAnimation').classList.remove('hidden');
+            setFighters();
+            setTimeout(() => {
+                showResult();
+            }, 2000);
+        }
+
+        function setFighters() {
+            const emojis = {
+                'rock': '🪨',
+                'paper': '📄',
+                'scissors': '✂️'
+            };
+            document.getElementById('fighter1').textContent = emojis[choices[1]];
+            document.getElementById('fighter2').textContent = emojis[choices[2]];
+        }
+
+        function showResult() {
+            let result = determineWinner();
+            document.getElementById('fightAnimation').classList.add('hidden');
+
+            // Update scores and scoreboard
+            updateScores(result.winner);
+            showScoreIncrement(result.winner);
+            updateScoreboard();
+
+            // Check if the game is over
+            let gameOver = false;
+            if (totalRounds === 3 && (scores[1] === 2 || scores[2] === 2)) {
+                gameOver = true;
+            } else if (totalRounds === 1 || currentRound === totalRounds) {
+                gameOver = true;
+            }
+
+            if (gameOver) {
+                showGameOver();
+            } else {
+                // Show round result notification
+                showNotification(result.message);
+            }
+        }
+
+        function showNotification(message) {
+            document.getElementById('notificationMessage').textContent = message;
+            document.getElementById('notificationModal').style.display = 'block';
+        }
+
+        function closeNotification() {
+            document.getElementById('notificationModal').style.display = 'none';
+            currentRound++;
+            currentPlayer = 1;
+            choices = { 1: '', 2: '' };
+            document.getElementById('playerTurn').classList.remove('hidden');
+            document.getElementById('turnMessage').textContent = 'Player 1, make your choice and pass the device.';
+            document.getElementById('choices').style.display = 'flex';
+            currentStage = 'showPlayer1Choice';
+        }
+
+        function determineWinner() {
+            const beats = {
+                'rock': 'scissors',
+                'paper': 'rock',
+                'scissors': 'paper'
+            };
+
+            if (choices[1] === choices[2]) {
+                return { winner: 0, message: "It's a Draw!" };
+            } else if (beats[choices[1]] === choices[2]) {
+                confettiEffect('#27ae60'); // Confetti when a player wins a round
+                return { winner: 1, message: "Player 1 Wins the Round!" };
+            } else {
+                confettiEffect('#27ae60'); // Confetti when a player wins a round
+                return { winner: 2, message: "Player 2 Wins the Round!" };
+            }
+        }
+
+        function updateScores(winner) {
+            if (winner !== 0) {
+                scores[winner]++;
+                document.getElementById(`score${winner}`).textContent = scores[winner];
+            }
+        }
+
+        function showGameOver() {
+            let finalMessage = '';
+            if (scores[1] > scores[2]) {
+                finalMessage = 'Player 1 Wins the Game!';
+                confettiEffect('#27ae60');
+            } else if (scores[2] > scores[1]) {
+                finalMessage = 'Player 2 Wins the Game!';
+                confettiEffect('#27ae60');
+            } else {
+                finalMessage = "It's a Tie Game!";
+            }
+            document.getElementById('gameOverMessage').textContent = finalMessage;
+            document.getElementById('gameOverModal').style.display = 'block';
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverModal').style.display = 'none';
+            document.getElementById('roundSelection').classList.remove('hidden');
+            document.getElementById('scoreboard').classList.add('hidden');
+            document.getElementById('playerTurn').classList.add('hidden');
+            document.getElementById('showChoices').classList.add('hidden');
+            document.getElementById('fightAnimation').classList.add('hidden');
+            scores = { 1: 0, 2: 0 };
+            score1Element.textContent = '0';
+            score2Element.textContent = '0';
+            updateScoreboard();
+            currentRound = 1;
+        }
+
+        function confettiEffect(color) {
+            confetti({
+                particleCount: 200,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: [color],
+                scalar: 1.2,
+            });
+        }
+
+        function updateScoreboard() {
+            player1Element.classList.remove('winner', 'loser', 'tied', 'blue');
+            player2Element.classList.remove('winner', 'loser', 'tied', 'blue');
+
+            if (scores[1] === 0 && scores[2] === 0) {
+                player1Element.classList.add('blue');
+                player2Element.classList.add('blue');
+            } else if (scores[1] > scores[2]) {
+                player1Element.classList.add('winner');
+                player2Element.classList.add('loser');
+            } else if (scores[2] > scores[1]) {
+                player2Element.classList.add('winner');
+                player1Element.classList.add('loser');
+            } else {
+                player1Element.classList.add('tied');
+                player2Element.classList.add('tied');
+            }
+        }
+
+        function showScoreIncrement(winner) {
+            if (winner !== 0) {
+                const increment = document.createElement('div');
+                increment.textContent = '+1';
+                increment.classList.add('score-increment');
+                document.getElementById(`player${winner}`).appendChild(increment);
+                setTimeout(() => {
+                    document.getElementById(`player${winner}`).removeChild(increment);
+                }, 1000);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
