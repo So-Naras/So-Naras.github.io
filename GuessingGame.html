@@ -1156,10 +1156,15 @@
                 const userCredential = await auth.createUserWithEmailAndPassword(username + '@example.com', password);
                 const user = userCredential.user;
 
+                // Automatically log in the user
+                currentUser = user.uid;
+                currentUserName = username; // Store the username
+                console.log('Current User Name:', currentUserName);
+
                 // Save additional user data to Firebase Realtime Database
-                var userRef = firebase.database().ref('users/' + user.uid);
+                var userRef = firebase.database().ref('users/' + currentUser);
                 userRef.set({
-                    username: username,
+                    username: currentUserName,
                     userScores: [],
                     winStreak: 0,
                     userMoney: 0
@@ -1169,11 +1174,8 @@
                 document.getElementById('signupUsername').value = '';
                 document.getElementById('signupPassword').value = '';
 
-                // Automatically log in the user
-                currentUser = user.uid;
-
                 // Proceed to the welcome back frame
-                showWelcomeBackFrame(username);
+                showWelcomeBackFrame(currentUserName);
             } catch (error) {
                 console.error('Error during sign up:', error);
                 showAlert('An error occurred during sign up: ' + error.message);
@@ -1223,20 +1225,16 @@
                         userScores[currentUser] = data.userScores || [];
                         winStreaks[currentUser] = data.winStreak || 0;
                         userMoney[currentUser] = data.userMoney || 0;
-                        data.username = data.username || username;
+                        currentUserName = data.username || username; // Store the username
                     } else {
                         // If no data exists, initialize it
                         userScores[currentUser] = [];
                         winStreaks[currentUser] = 0;
                         userMoney[currentUser] = 0;
-                        data.username = username;
+                        currentUserName = username;
                     }
 
-                    // Store the username for display purposes
-                    currentUserName = data.username;
-
                     // Proceed to user menu
-                    userMenu();
                     showWelcomeBackFrame(currentUserName);
                 }).catch(function (error) {
                     console.error('Error fetching user data:', error);
@@ -1269,7 +1267,10 @@
                     updateProgressBar(value + 5);
                 }, 100);
             } else {
-                switchToUserMenu();
+                // Delay switching to user menu to allow progress bar to display
+                setTimeout(function () {
+                    switchToUserMenu();
+                }, 500); // Adjust delay as needed
             }
         }
 
@@ -1285,70 +1286,74 @@
             });
         }
 
+        function updateUserMenuUI(totalScore) {
+            document.getElementById('userPointsChip').innerHTML = '<i class="fas fa-star"></i> Total Points: ' + formatScore(totalScore);
+            // Update other parts of the user menu with the latest score
+        }
+
+
+
         // User Menu
         function userMenu() {
             // Calculate user's total points
-            var totalScore = 0;
-            if (userScores[currentUser]) {
-                for (var i = 0; i < userScores[currentUser].length; i++) {
-                    var game = userScores[currentUser][i];
-                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
-                        totalScore += game.score;
-                    }
-                }
-            }
+            var totalScore = calculateTotalScore();
 
-            // Get all scores and determine the user's position
-            var allScores = [];
-            for (var user in userScores) {
-                var userTotal = 0;
-                for (var j = 0; j < userScores[user].length; j++) {
-                    var game = userScores[user][j];
-                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
-                        userTotal += game.score;
+            // Fetch leaderboard data from Firebase
+            firebase.database().ref('leaderboard').once('value').then(function (snapshot) {
+                var leaderboardData = snapshot.val();
+                var allScores = [];
+
+                for (var userId in leaderboardData) {
+                    var entry = leaderboardData[userId];
+                    allScores.push({ user: entry.username, score: entry.totalScore });
+                }
+
+                // Sort and find user's position
+                allScores.sort(function (a, b) {
+                    return b.score - a.score;
+                });
+
+                var position = null;
+                for (var i = 0; i < allScores.length; i++) {
+                    if (allScores[i].user === currentUserName) {
+                        position = i + 1;
+                        break;
                     }
                 }
-                allScores.push({ user: user, score: userTotal });
-            }
-            allScores.sort(function (a, b) {
-                return b.score - a.score;
+
+                // Determine the class for the points chip based on leaderboard position
+                var pointsClass = 'default';
+                if (position === 1) {
+                    pointsClass = 'gold';
+                } else if (position === 2) {
+                    pointsClass = 'silver';
+                } else if (position === 3) {
+                    pointsClass = 'bronze';
+                }
+
+                var winStreak = winStreaks[currentUser] || 0;
+                var money = userMoney[currentUser] || 0;
+
+                document.getElementById('userMenuLabel').textContent = currentUserName + "'s User Menu";
+
+                var userPointsChip = document.getElementById('userPointsChip');
+                userPointsChip.innerHTML = '<i class="fas fa-star"></i> Total Points: ' + formatScore(totalScore);
+                userPointsChip.className = 'info-chip ' + pointsClass;
+
+                var userMoneyChip = document.getElementById('userMoneyChip');
+                userMoneyChip.innerHTML = '<i class="fas fa-coins"></i> Money: ' + formatScore(money);
+                userMoneyChip.className = 'info-chip greener';
+
+                var winStreakChip = document.getElementById('winStreakChip');
+                winStreakChip.innerHTML = '<i class="fas fa-fire"></i> Win Streak: ' + winStreak;
+                winStreakChip.className = 'info-chip orange';
+
+                switchFrame('userMenuFrame');
+            }).catch(function (error) {
+                console.error('Error fetching leaderboard data for user menu:', error);
+                showAlert('An error occurred while loading your data.');
             });
-            var position = null;
-            for (var i = 0; i < allScores.length; i++) {
-                if (allScores[i].user === currentUser) {
-                    position = i + 1;
-                    break;
-                }
-            }
 
-            // Determine the class for the points chip based on leaderboard position
-            var pointsClass = 'default';
-            if (position === 1) {
-                pointsClass = 'gold';
-            } else if (position === 2) {
-                pointsClass = 'silver';
-            } else if (position === 3) {
-                pointsClass = 'bronze';
-            }
-
-            var winStreak = winStreaks[currentUser] || 0;
-            var money = userMoney[currentUser] || 0;
-
-            document.getElementById('userMenuLabel').textContent = currentUserName + "'s User Menu";
-
-            var userPointsChip = document.getElementById('userPointsChip');
-            userPointsChip.innerHTML = '<i class="fas fa-star"></i> Total Points: ' + formatScore(totalScore);
-            userPointsChip.className = 'info-chip ' + pointsClass;
-
-            var userMoneyChip = document.getElementById('userMoneyChip');
-            userMoneyChip.innerHTML = '<i class="fas fa-coins"></i> Money: ' + formatMoney(money);
-            userMoneyChip.className = 'info-chip greener';
-
-            var winStreakChip = document.getElementById('winStreakChip');
-            winStreakChip.innerHTML = '<i class="fas fa-fire"></i> Win Streak: ' + winStreak;
-            winStreakChip.className = 'info-chip orange';
-
-            switchFrame('userMenuFrame');
         }
         // Format Money
         function formatMoney(amount) {
@@ -1482,8 +1487,7 @@
 
             // Deduct the bet amount upfront
             if (betAmount > 0) {
-                //userMoney[currentUser] -= betAmount;
-                console.log("userMoneyBefore" + userMoney[currentUser]);
+                userMoney[currentUser] -= betAmount;
                 saveUserMoney();
             }
 
@@ -1491,7 +1495,6 @@
             difficulty = document.getElementById('difficultySelect').value;
 
             if (rangeSize < 25) {
-
                 showConfirm(`
             <strong>Range Less Than 25</strong>
             <ul class="modal-list">
@@ -1504,14 +1507,12 @@
             Do you wish to proceed?
         `, {
                     iconClass: 'fas fa-exclamation-triangle',
-
                     title: 'Range Too Small',
                     callback: function (result) {
                         if (result) {
                             difficulty = 'Easy';
                             document.getElementById('difficultySelect').value = 'Easy';
                             pointsPenaltyFactor = 0.5;
-                            console.log(pointsPenaltyFactor);
                             proceedWithGameSetup();
                         } else {
                             document.getElementById('entryMin').value = '';
@@ -1520,7 +1521,7 @@
                         }
                     }
                 });
-                return; // Prevent further execution until user responds
+                return;
             } else if (difficulty === 'Easy' && rangeSize >= 25) {
                 showConfirm(`
             <strong>Easy Mode Nerfs:</strong>
@@ -1535,8 +1536,8 @@
                     title: 'Easy Mode Warning',
                     callback: function (result) {
                         if (result) {
-                            proceedWithGameSetup();
                             pointsPenaltyFactor = 0.5;
+                            proceedWithGameSetup();
                         } else {
                             document.getElementById('entryMin').value = '';
                             document.getElementById('entryMax').value = '';
@@ -1550,18 +1551,21 @@
                 proceedWithGameSetup();
             }
 
-            // Helper function to proceed with game setup
             function proceedWithGameSetup() {
                 numberToGuess = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
-                console.log(numberToGuess);
+                console.log('Number to guess:', numberToGuess);
                 previousGuesses = [];
                 difficultyFactor = difficultySettings[difficulty];
                 totalAttempts = Math.max(Math.floor(difficultyFactor * largestPowerOf2(rangeSize)), 5);
                 attempts = totalAttempts;
+                winstreakMultiplierApplied = Math.max(winStreaks[currentUser] || 0, 1);
                 document.getElementById('submitGuessButton').disabled = false;
                 document.getElementById('guessProgressBar').value = 0;
                 document.getElementById('guessProgressLabel').textContent = 'Guesses Used: 0/' + totalAttempts;
-                showPenaltyAndMultiplierMessages()
+
+                // Show the win streak and penalty/multiplier messages right after game setup
+                showPenaltyAndMultiplierMessages();
+
                 switchFrame('gameGuessFrame');
             }
         }
@@ -1591,11 +1595,11 @@
                 document.getElementById('feedbackLabel').textContent = 'Congratulations! You guessed the correct number: ' + numberToGuess + '.';
                 document.getElementById('feedbackLabel').className = 'message success';
 
+                // Calculate points based on difficulty
                 difficulty = document.getElementById('difficultySelect').value;
                 var difficultyMultiplier = difficultyScoreMultiplier[difficulty];
                 var points;
 
-                // Calculate points based on difficulty
                 if (difficulty === 'Easy') {
                     points = Math.floor(((attempts + 1) / totalAttempts) * 100 * difficultyMultiplier * pointsPenaltyFactor);
                 } else {
@@ -1608,11 +1612,16 @@
                 // Add points to the user score and handle win streaks
                 handleWinAndSave(points);
 
-                // Proceed to the score report
+                // Update win streak and show messages
+                updateWinstreak(true);
+
+                showPenaltyAndMultiplierMessages(); // Ensure the multiplier message is shown
+
+                // Proceed to the score report after a short delay
                 setTimeout(function () {
                     switchFrame('postGameFrame');
                     updatePostGameProgress(0);
-                }, 3000); // Wait for 3 seconds before switching frames
+                }, 3000); // 3-second delay before switching frames
 
             } else if (guess < numberToGuess) {
                 document.getElementById('feedbackLabel').textContent = 'The number is higher.';
@@ -1624,13 +1633,15 @@
 
             updateGuessProgress();
 
-            // Check if out of attempts
+            winstreakMultiplierApplied = Math.max(winStreaks[currentUser], 1);
+            showPenaltyAndMultiplierMessages();  // Ensure messages are updated after each guess
+
+            // Check if out of attempts and the guess is incorrect
             if (attempts === 0 && guess !== numberToGuess) {
                 document.getElementById('feedbackLabel').textContent = 'Game over! The number was ' + numberToGuess + '.';
                 document.getElementById('feedbackLabel').className = 'message error';
 
-                var points = 0; // No points earned for an incorrect guess
-
+                var points = 0; // No points for an incorrect guess
                 legion = points;
 
                 handleLossAndSave(points);
@@ -1639,7 +1650,7 @@
                 setTimeout(function () {
                     switchFrame('postGameFrame');
                     updatePostGameProgress(0);
-                }, 3000); // Wait for 3 seconds before switching frames
+                }, 3000); // 3-second delay
             }
         }
 
@@ -1659,22 +1670,30 @@
         // Function to handle win and save points
         function handleWinAndSave(points) {
             var moneyEarned = points * 0.01;
+            console.log(points);
             if (betAmount > 0) {
-                console.log(betAmount);
                 moneyEarned += betAmount;
-
             }
 
             userMoney[currentUser] = (userMoney[currentUser] || 0) + moneyEarned;
             saveUserMoney();
 
+            // Validate the score and ensure it's a valid number
+            if (isNaN(points)) {
+                console.error("Error: Calculated points are NaN. Setting to 0.");
+                points = 0;  // Set to 0 or handle appropriately
+            }
+
+            if (!userScores[currentUser]) {
+                userScores[currentUser] = [];
+            }
+
             userScores[currentUser].push({
-                'score': points,
+                'score': points,  // Now safe to push
                 'difficulty': difficulty,
                 'attempts': (totalAttempts - attempts) + '/' + totalAttempts,
-                'betAmount': betAmount // Save betAmount with the game data
+                'betAmount': betAmount
             });
-
 
             saveUserScores();
             betAmount = 0;
@@ -1684,7 +1703,7 @@
 
             var userRef = firebase.database().ref('users/' + currentUser);
             userRef.set({
-                username: currentUser,
+                username: currentUserName,
                 userScores: userScores[currentUser] || [],
                 winStreak: winStreaks[currentUser] || 0,
                 userMoney: userMoney[currentUser] || 0
@@ -1698,20 +1717,30 @@
         function handleLossAndSave(points) {
             var moneyLost = 0;
             if (betAmount > 0) {
-                moneyLost = betAmount; // The bet amount is lost.
-                console.log("Lost" + moneyLost);
+                moneyLost = betAmount;
                 userMoney[currentUser] = (userMoney[currentUser] || 0) - moneyLost;
                 betAmount = 0;
                 saveUserMoney();
+            }
+
+            // Validate the score and ensure it's a valid number
+            if (isNaN(points)) {
+                console.error("Error: Calculated points are NaN. Setting to 0.");
+                points = 0;  // Set to 0 or handle appropriately
+            }
+
+            if (!userScores[currentUser]) {
+                userScores[currentUser] = [];
             }
 
             userScores[currentUser].push({
                 'score': points,
                 'difficulty': difficulty,
                 'attempts': '0/' + totalAttempts,
-                'moneyLost': moneyLost, // Store the lost money if applicable
-                'betAmount': betAmount // Save betAmount with the game data
+                'moneyLost': moneyLost,
+                'betAmount': betAmount
             });
+
             saveUserScores();
 
             updateWinstreak(false);
@@ -1719,7 +1748,7 @@
 
             var userRef = firebase.database().ref('users/' + currentUser);
             userRef.set({
-                username: currentUser,
+                username: currentUserName,
                 userScores: userScores[currentUser] || [],
                 winStreak: winStreaks[currentUser] || 0,
                 userMoney: userMoney[currentUser] || 0
@@ -1768,7 +1797,11 @@
                 winStreaks[currentUser] = 0;
             }
             saveWinStreaks();
-            showPenaltyAndMultiplierMessages(); // Ensure the messages are updated based on the new win streak value
+
+            // Update winstreakMultiplierApplied
+            winstreakMultiplierApplied = Math.max(winStreaks[currentUser], 1);
+
+            showPenaltyAndMultiplierMessages();
         }
 
         // Post Game Progress
@@ -1795,71 +1828,48 @@
             var finalStatsContent = document.getElementById('finalStatsContent');
             finalStatsContent.innerHTML = '';
 
-            difficulty = document.getElementById('difficultySelect').value;
-            var difficultyMultiplier = difficultyScoreMultiplier[difficulty];
+            // Fetch leaderboard data to get leaderboard position and total points
+            firebase.database().ref('leaderboard').once('value').then(function (snapshot) {
+                var leaderboardData = snapshot.val();
+                var allScores = [];
 
-            // Calculate total points and leaderboard position
-            var totalPoints = 0;
-            if (userScores[currentUser]) {
-                for (var i = 0; i < userScores[currentUser].length; i++) {
-                    var game = userScores[currentUser][i];
-                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
-                        totalPoints += game.score;
+                // Process the leaderboard data
+                for (var userId in leaderboardData) {
+                    var entry = leaderboardData[userId];
+                    allScores.push({ user: entry.username, score: entry.totalScore });
+                }
+
+                // Sort scores in descending order
+                allScores.sort(function (a, b) {
+                    return b.score - a.score;
+                });
+
+                // Find current user's score and position
+                var position = null;
+                var totalPoints = 0;
+                for (var i = 0; i < allScores.length; i++) {
+                    if (allScores[i].user === currentUserName) {
+                        position = i + 1; // Rank starts from 1
+                        totalPoints = allScores[i].score; // Get the user's total score
+                        break;
                     }
                 }
-            }
 
-            // Get total money and money earned/lost in the current round
-            var totalMoney = userMoney[currentUser] || 0;
-            var moneyEarned = legion * 0.01;
-            var lastGame = userScores[currentUser][userScores[currentUser].length - 1];
-            var betAmount = lastGame.betAmount || 0;
-            var moneyLost = lastGame.moneyLost || 0;
-            console.log("Pre Bet" + moneyEarned);
-            moneyEarned += betAmount;
-            console.log("Post Bet" + moneyEarned);
-            console.log(betAmount);
-            console.log(betAmount);
+                // Now update the Final Stats UI using this leaderboard data
+                updateFinalStatsUIFromLeaderboard(totalPoints, position);
 
-            // Determine the class and text for the Money Earned/Lost chip
-            var moneyClass = 'greener';
-            var moneyText = 'Money Earned: ';
-            if (moneyLost > 0) {
-                moneyEarned = moneyLost;
-                moneyClass = 'points-none'; // Red if the bet was lost.
-                moneyText = 'Money Lost: ';
-                //moneyEarned = moneyLost * 2; // Display the lost money as positive without a negative sign.
-            } else if (betAmount > 0) {
-                console.log(moneyEarned);
-                //moneyEarned += betAmount * 2; // Add winnings from the bet if applicable.
-                //console.log(betAmount);
-            }
-
-            // Get all scores and determine the user's position
-            var allScores = [];
-            for (var user in userScores) {
-                var userTotal = 0;
-                for (var j = 0; j < userScores[user].length; j++) {
-                    var game = userScores[user][j];
-                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
-                        userTotal += game.score;
-                    }
-                }
-                allScores.push({ user: user, score: userTotal });
-            }
-            allScores.sort(function (a, b) {
-                return b.score - a.score;
+            }).catch(function (error) {
+                console.error('Error fetching leaderboard data for final stats:', error);
+                showAlert('Error loading final stats.');
             });
-            var position = null;
-            for (var i = 0; i < allScores.length; i++) {
-                if (allScores[i].user === currentUser) {
-                    position = i + 1;
-                    break;
-                }
-            }
+        }
 
-            // Determine the class for the points chip based on leaderboard position
+        // Helper function to update Final Stats UI based on leaderboard data
+        function updateFinalStatsUIFromLeaderboard(totalPoints, position) {
+            var finalStatsContent = document.getElementById('finalStatsContent');
             var pointsClass = 'default';
+
+            // Determine leaderboard position color
             if (position === 1) {
                 pointsClass = 'gold';
             } else if (position === 2) {
@@ -1867,6 +1877,14 @@
             } else if (position === 3) {
                 pointsClass = 'bronze';
             }
+
+            var currentWinstreak = winStreaks[currentUser] || 0;
+            var totalMoney = userMoney[currentUser] || 0;
+            var lastGame = userScores[currentUser][userScores[currentUser].length - 1];
+            var pointsEarned = lastGame.score || 0;
+            var betAmount = lastGame.betAmount || 0;
+            var moneyLost = lastGame.moneyLost || 0;
+            var difficulty = lastGame.difficulty || 'Normal';
 
             // Determine the class for the difficulty chip
             var difficultyClass = 'default';
@@ -1888,69 +1906,66 @@
                     break;
             }
 
-            // Determine the class for the points earned chip based on the points earned in the current round
+            // Determine the class for the points earned chip
             var pointsEarnedClass = 'points-none';
-            if (legion > 1000) {
+            if (pointsEarned > 1000) {
                 pointsEarnedClass = 'points-high';
-            } else if (legion > 500) {
+            } else if (pointsEarned > 500) {
                 pointsEarnedClass = 'points-medium';
-            } else if (legion > 0) {
+            } else if (pointsEarned > 0) {
                 pointsEarnedClass = 'points-low';
             }
 
-            var currentWinstreak = winStreaks[currentUser] || 0;
+            // Determine the class for the money earned/lost chip
+            var moneyClass = moneyLost > 0 ? 'points-none' : 'greener'; // red for loss, green for earnings
+            var moneyText = moneyLost > 0 ? `Money Lost: -${formatScore(moneyLost)}` : `Money Earned: ${formatScore(pointsEarned * 0.01)}`;
 
-            // Create chips for the final stats
-            var content = '<div class="chip-container">';
-
-            // Difficulty Chip
-            content += '<div class="info-chip ' + difficultyClass + '">';
-            content += '<i class="fas fa-tachometer-alt"></i> Difficulty: <span>' + difficulty + '</span>';
-            content += '</div>';
-            content += '</div>'; // Close first chip-container
-
-            // Second row: Leaderboard Position
-            content += '<div class="chip-container">';
-            content += '<div class="info-chip ' + pointsClass + '">';
-            content += '<i class="fas fa-trophy"></i> Leaderboard Position: <span class="animated-number" data-target="' + position + '">0</span>';
-            content += '</div>';
-            content += '</div>'; // Close second chip-container
-
-            // Third row: Total Points and Money
-            content += '<div class="chip-container">';
-            content += '<div class="info-chip">';
-            content += '<i class="fas fa-star"></i> Total Points: <span class="animated-number" data-target="' + totalPoints + '">0</span>';
-            content += '</div>';
-
-            content += '<div class="info-chip greener">';
-            content += '<i class="fas fa-coins"></i> Money: <span class="animated-number" data-target="' + totalMoney + '">0</span>';
-            content += '</div>';
-            content += '</div>'; // Close third chip-container
-
-            // Fourth row: Points Earned and Money Earned
-            content += '<div class="chip-container">';
-            content += '<div class="info-chip ' + pointsEarnedClass + '">';
-            content += '<i class="fas fa-plus-circle"></i> Points Earned: <span class="animated-number" data-target="' + legion + '">0</span>';
-            content += '</div>';
-
-            content += '<div class="info-chip ' + moneyClass + '">';
-            content += '<i class="fas fa-dollar-sign"></i>' + moneyText + '<span class="animated-number" data-target="' + moneyEarned.toFixed(2) + '">0</span>';
-            content += '</div>';
-            content += '</div>'; // Close fourth chip-container
-
-            // Fifth row: Win Streak
-            content += '<div class="chip-container">';
-            content += '<div class="info-chip orange">';
-            content += '<i class="fas fa-fire"></i> Win Streak: <span class="animated-number" data-target="' + currentWinstreak + '">0</span>';
-            content += '</div>';
-            content += '</div>'; // Close fifth chip-container
+            // Create and display the final stats content
+            var content = `
+        <div class="chip-container">
+            <div class="info-chip ${difficultyClass}">
+                <i class="fas fa-tachometer-alt"></i> Difficulty: <span>${difficulty}</span>
+            </div>
+        </div>
+        <div class="chip-container">
+            <div class="info-chip ${pointsClass}">
+                <i class="fas fa-trophy"></i> Leaderboard Position: <span class="animated-number" data-target="${position}">0</span>
+            </div>
+        </div>
+        <div class="chip-container">
+            <div class="info-chip">
+                <i class="fas fa-star"></i> Total Points: <span class="animated-number" data-target="${totalPoints}">0</span>
+            </div>
+            <div class="info-chip greener">
+                <i class="fas fa-coins"></i> Total Money: <span class="animated-number" data-target="${totalMoney}">0</span>
+            </div>
+        </div>
+        <div class="chip-container">
+            <div class="info-chip ${pointsEarnedClass}">
+                <i class="fas fa-plus-circle"></i> Points Earned: <span class="animated-number" data-target="${pointsEarned}">0</span>
+            </div>
+            <div class="info-chip ${moneyClass}">
+                <i class="fas fa-dollar-sign"></i> ${moneyText}
+            </div>
+        </div>
+        <div class="chip-container">
+            <div class="info-chip orange">
+                <i class="fas fa-fire"></i> Win Streak: <span class="animated-number" data-target="${currentWinstreak}">0</span>
+            </div>
+        </div>
+    `;
 
             finalStatsContent.innerHTML = content;
 
-            // Start the number animations
-            animateNumbers();
-
             // Show or hide penalty and multiplier notes
+            showPenaltyAndMultiplierNotes();
+
+            // Call animateNumbers to start the animation
+            animateNumbers();
+        }
+
+        // Function to show penalty and multiplier notes
+        function showPenaltyAndMultiplierNotes() {
             var penaltyNote = document.getElementById('penaltyNote');
             var multiplierNote = document.getElementById('multiplierNote');
 
@@ -2036,7 +2051,6 @@
 
         // Handle Logout
         function handleLogout() {
-            // Save data to Firebase
             if (currentUser) {
                 var userRef = firebase.database().ref('users/' + currentUser);
                 userRef.set({
@@ -2044,12 +2058,17 @@
                     userScores: userScores[currentUser] || [],
                     winStreak: winStreaks[currentUser] || 0,
                     userMoney: userMoney[currentUser] || 0
+                }, function (error) {
+                    if (!error) {
+                        console.log('User data updated successfully.');
+                    } else {
+                        console.error('Failed to update user data:', error);
+                    }
                 });
             }
 
             // Sign out from Firebase Authentication
             auth.signOut().then(function () {
-                // Proceed with logout
                 switchFrame('sessionResetFrame');
                 updateResetProgress(0);
             }).catch(function (error) {
