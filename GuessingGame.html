@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>The Guessing Game</title>
+    <!-- Import Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+    <!-- Include Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+        }
+
+        #finalStatsContent {
+            text-align: center;
+        }
+
+        #leaderboardTable tr {
+            color: #f0f0f0;
+        }
+
+        #leaderboardTable tr:nth-child(odd) {
+            background-color: #2e2e2e;
+        }
+
+        #leaderboardTable tr:nth-child(even) {
+            background-color: #1e1e1e;
+        }
+
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+
+        /* Info Chip Styles */
+        .info-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            background-color: #2e2e2e;
+            color: #f0f0f0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .info-chip i {
+            margin-right: 8px;
+        }
+
+        #shopFrame {
+            text-align: center;
+        }
+
+        /* Green money chip */
+        .info-chip.greener {
+            background-color: #06d625;
+            /* Green color */
+            color: #fff;
+        }
+
+        /* Adjust label and paragraph styles */
+        #shopFrame label,
+        #shopFrame p {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        /* Leaderboard Position Colors */
+        .info-chip.gold {
+            background-color: gold;
+            color: #000;
+        }
+
+        .info-chip.silver {
+            background-color: silver;
+            color: #000;
+        }
+
+        .info-chip.bronze {
+            background-color: #cd7f32;
+            color: #fff;
+        }
+
+        .info-chip.orange {
+            background-color: #ff8c00;
+            color: #fff;
+        }
+
+        .info-chip.normal {
+            background-color: #3a86ff;
+            /* Blue */
+            color: #fff;
+        }
+
+        /* Difficulty Colors */
+        .info-chip.green {
+            background-color: #06d6a0;
+            color: #fff;
+        }
+
+        .info-chip.yellow {
+            background-color: #ffd166;
+            color: #000;
+        }
+
+        .info-chip.red {
+            background-color: #ff006e;
+            color: #fff;
+        }
+
+        .info-chip.purple {
+            background-color: #8338ec;
+            color: #fff;
+        }
+
+        /* Points Earned Colors */
+        .info-chip.points-high {
+            background-color: #06d6a0;
+            /* Green for high points */
+            color: #fff;
+        }
+
+        .info-chip.points-medium {
+            background-color: #ffd166;
+            /* Yellow for medium points */
+            color: #000;
+        }
+
+        .info-chip.points-low {
+            background-color: #ff8c00;
+            /* Orange for low points */
+            color: #fff;
+        }
+
+        .info-chip.points-none {
+            background-color: #ff0000;
+            /* Orange for low points */
+            color: #fff;
+        }
+
+        /* Leaderboard Position Colors */
+        .info-chip.top-rank {
+            background-color: gold;
+            /* Gold for top ranks */
+            color: #000;
+        }
+
+        .info-chip.mid-rank {
+            background-color: silver;
+            /* Silver for mid ranks (e.g., positions 4-10) */
+            color: #000;
+        }
+
+        .info-chip.low-rank {
+            background-color: #cd7f32;
+            /* Bronze-like color for lower ranks (positions 11 and beyond) */
+            color: #fff;
+        }
+
+        .info-chip.default {
+            background-color: #2e2e2e;
+            /* Default for Normal */
+            color: #f0f0f0;
+        }
+
+        .info-chip span {
+            margin-left: 4px;
+            /* Adjust as needed */
+        }
+
+        /* Animated Number Styles */
+        .animated-number {
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Style the filter chips */
+        .filter-chip {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 25px;
+            background-color: #2e2e2e;
+            color: #f0f0f0;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        /* Active state */
+        .filter-chip.active {
+            background-color: #3a86ff;
+            color: #fff;
+        }
+
+        /* Hover effect */
+        .filter-chip:hover {
+            transform: scale(1.05);
+        }
+
+        .search-filter-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* Adjust the search input */
+        #pastScoresSearch {
+            width: 70%;
+            max-width: 300px;
+            padding: 10px 15px;
+            margin: 0;
+            border: 1px solid #555;
+            border-radius: 8px 0 0 8px;
+            background-color: #2e2e2e;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        /* Styles for the Filters button */
+        .btn-filter {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            background-color: #3a86ff;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-filter:hover {
+            background-color: #2a6bc4;
+        }
+
+        /* Styles for the filter options */
+        #filterOptions {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.5s ease-out;
+        }
+
+        #filterOptions.show {
+            max-height: 200px;
+            /* Adjust as needed */
+            transition: max-height 0.5s ease-in;
+        }
+
+        #filterOptions.hidden {
+            display: none;
+        }
+
+        #filterOptions label {
+            display: inline-block;
+            margin: 5px 10px;
+            font-size: 16px;
+            color: #f0f0f0;
+        }
+
+        #filterOptions input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        /* Adjust the icon inside the Filters button */
+        #toggleFiltersButton i {
+            margin-left: 5px;
+            transition: transform 0.3s;
+        }
+
+        #toggleFiltersButton.rotate i {
+            transform: rotate(180deg);
+        }
+
+        .modal {
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(30, 30, 30, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 25px 20px;
+            border-radius: 12px;
+            border: 2px solid #3a86ff;
+            /* Add this line */
+            text-align: center;
+            width: 85%;
+            max-width: 450px;
+            color: #f0f0f0;
+            position: relative;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header i {
+            font-size: 2em;
+            margin-right: 10px;
+            color: #ffd166;
+            /* Icon color */
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            margin: 0;
+        }
+
+        .modal-message {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: #e0e0e0;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .modal-buttons .btn {
+            flex: 1;
+            max-width: 120px;
+        }
+
+        .alert-modal {
+            border: 2px solid #ef476f;
+            /* Red border for alerts */
+        }
+
+        .confirm-modal {
+            border: 2px solid #ffd166;
+            /* Yellow border for confirmations */
+        }
+
+        .modal-list {
+            list-style: none;
+            /* Remove default bullets */
+            padding-left: 0;
+            margin: 15px 0;
+        }
+
+        .modal-list li {
+            position: relative;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            padding-left: 25px;
+            /* Space for the custom bullet */
+        }
+
+        .modal-list li::before {
+            content: '-';
+            color: red;
+            /* Red color for the bullet */
+            position: absolute;
+            left: 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Fade Out Animation */
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+
+        /* Apply Animation to Modal Content */
+        .modal-content {
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.hidden .modal-content {
+            animation: fadeOut 0.3s;
+        }
+
+        .modal-buttons .btn {
+            margin: 0 10px;
+        }
+
+        /* Hide Modals by Default */
+        .hidden {
+            display: none !important;
+            /* Ensures the element is fully hidden */
+        }
+
+        .message-box {
+            display: inline-block;
+            /* Allows the box to adjust its width based on content */
+            margin: 10px 0;
+            /* Vertical spacing */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            border: 2px solid;
+        }
+
+        .message-box.red {
+            background-color: #ffebee;
+            /* Light red background */
+            border-color: #d32f2f;
+            /* Brighter red border */
+            color: #d32f2f;
+            /* Brighter red text */
+        }
+
+        .message-box.green {
+            background-color: #e8f5e9;
+            /* Light green background */
+            border-color: #388e3c;
+            /* Brighter green border */
+            color: #388e3c;
+            /* Brighter green text */
+        }
+
+        progress {
+            display: block;
+            margin: 20px auto;
+            /* Adjust the top/bottom margin as needed */
+        }
+
+        #guessProgressLabel,
+        #postGameProgressLabel,
+        #sessionResetProgressLabel,
+        #loadingMessageLabel {
+            text-align: center;
+        }
+
+        #userPointsLabel,
+        #winStreakLabel {
+            text-align: center;
+        }
+
+        #guessProgressLabel {
+            text-align: center;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            font-weight: 500;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Frame Styles */
+        .frame {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.5s;
+        }
+
+        #mainMenuFrame {
+            display: block;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: block;
+            margin: 15px auto;
+            padding: 15px 25px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #fff;
+            background-color: #3a86ff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 80%;
+            max-width: 300px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2a6bc4;
+        }
+
+        .btn-secondary {
+            background-color: #8338ec;
+        }
+
+        .btn-secondary:hover {
+            background-color: #642dbc;
+        }
+
+        .btn-danger {
+            background-color: #ff006e;
+        }
+
+        .btn-danger:hover {
+            background-color: #cc0056;
+        }
+
+        /* Input Styles */
+        .input-field {
+            width: 80%;
+            max-width: 300px;
+            padding: 12px 15px;
+            margin: 10px auto;
+            display: block;
+            border: 1px solid #555;
+            border-radius: 8px;
+            background-color: #2e2e2e;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        /* Table Styles */
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        th,
+        td {
+            border: 1px solid #444;
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #3a86ff;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        tr:nth-child(even) {
+            background-color: #2e2e2e;
+        }
+
+        /* Progress Bar Styles */
+        progress {
+            width: 80%;
+            max-width: 400px;
+            height: 20px;
+            margin: 20px auto;
+            display: block;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        progress::-webkit-progress-bar {
+            background-color: #444;
+            border-radius: 10px;
+        }
+
+        progress::-webkit-progress-value {
+            background-color: #3a86ff;
+            border-radius: 10px;
+        }
+
+        /* Message Styles */
+        .message {
+            text-align: center;
+            font-size: 18px;
+            margin: 20px auto;
+        }
+
+        .message.success {
+            color: #06d6a0;
+        }
+
+        .message.error {
+            color: #ff006e;
+        }
+
+        /* Animation Styles */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Back Button Styles */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: transparent;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Header Styles */
+        .header {
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+
+    <!-- Include Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <!-- Add Firebase Authentication SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+</head>
+
+<body>
+    <!-- Main Menu Frame -->
+    <div id="mainMenuFrame" class="frame">
+        <h1>The Guessing Game</h1>
+        <button class="btn" onclick="signUp()">Sign Up</button>
+        <button class="btn" onclick="logIn()">Log In</button>
+        <button class="btn" onclick="showLeaderboard(null, false)">Show Leaderboard</button>
+        <button class="btn btn-danger" onclick="quit()">Quit</button>
+    </div>
+
+    <!-- Sign Up Frame -->
+    <div id="signupFrame" class="frame">
+        <div class="header">
+            <button class="back-button" onclick="switchFrame('mainMenuFrame')"><i
+                    class="fas fa-arrow-left"></i></button>
+            <h2>Sign Up</h2>
+        </div>
+        <label for="signupUsername">Username</label>
+        <input type="text" id="signupUsername" class="input-field">
+        <label for="signupPassword">Password</label>
+        <input type="password" id="signupPassword" class="input-field">
+        <button class="btn" onclick="submitSignup()">Submit</button>
+    </div>
+
+    <!-- Log In Frame -->
+    <div id="loginFrame" class="frame">
+        <div class="header">
+            <button class="back-button" onclick="switchFrame('mainMenuFrame')"><i
+                    class="fas fa-arrow-left"></i></button>
+            <h2>Log In</h2>
+        </div>
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" class="input-field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" class="input-field">
+        <button class="btn" onclick="submitLogin()">Submit</button>
+    </div>
+
+    <!-- User Menu Frame -->
+    <div id="userMenuFrame" class="frame">
+        <h2 id="userMenuLabel"></h2>
+        <div class="chip-container">
+            <div id="userPointsChip" class="info-chip"></div>
+            <div id="userMoneyChip" class="info-chip"></div>
+        </div>
+
+        <div class="chip-container">
+            <div id="winStreakChip" class="info-chip"></div>
+        </div>
+        <button class="btn" onclick="startNewGame()">Start New Game</button>
+        <button class="btn" onclick="openShop()">Shop</button>
+        <button class="btn" onclick="showPastScores()">View Past Scores</button>
+        <button class="btn" onclick="showLeaderboard(currentUser, true)">View Leaderboard</button>
+        <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
+    </div>
+
+    <!-- Shop Frame -->
+    <div id="shopFrame" class="frame">
+        <div class="header">
+            <button class="back-button" onclick="userMenu()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Shop</h2>
+        </div>
+        <div class="chip-container">
+            <div id="shopPointsChip" class="info-chip">
+                <i class="fas fa-star"></i> Points: <span id="shopPointsDisplay">0</span>
+            </div>
+            <div id="shopMoneyChip" class="info-chip greener">
+                <i class="fas fa-coins"></i> Money: <span id="shopMoneyDisplay">0</span>
+            </div>
+        </div>
+        <label for="pointsToConvert">Convert Points to Money</label>
+        <p style="text-align: center;">(1 Money = 1000 Points)</p>
+        <input type="number" id="pointsToConvert" class="input-field" placeholder="Enter Points to Convert">
+        <button class="btn" onclick="convertPointsToMoney()">Convert</button>
+    </div>
+
+    <!-- Game Frame -->
+    <div id="gameFrame" class="frame">
+        <div class="header">
+            <button class="back-button" onclick="switchFrame('userMenuFrame')"><i
+                    class="fas fa-arrow-left"></i></button>
+            <h2>Enter Game Settings</h2>
+        </div>
+        <label for="entryMin">Min Value</label>
+        <input type="text" id="entryMin" class="input-field">
+        <label for="entryMax">Max Value</label>
+        <input type="text" id="entryMax" class="input-field">
+        <label for="difficultySelect">Difficulty</label>
+        <select id="difficultySelect" class="input-field">
+            <option value="Easy">Easy</option>
+            <option value="Normal" selected>Normal</option>
+            <option value="Difficult">Difficult</option>
+            <option value="Hell">Hell</option>
+            <option value="Godly">Godly</option>
+        </select>
+        <label for="betAmount">Bet Amount (Money)</label>
+        <input type="number" id="betAmount" class="input-field" placeholder="Optional">
+        <button class="btn" onclick="submitGame()">Start Game</button>
+    </div>
+
+    <!-- Game Guess Frame -->
+    <div id="gameGuessFrame" class="frame">
+        <div class="header">
+            <button class="back-button" onclick="backToMenuFromGame()"><i class="fas fa-arrow-left"></i></button>
+            <h2>Guess the Number</h2>
+        </div>
+        <input type="text" id="entryGuess" class="input-field">
+        <p id="feedbackLabel" class="message"></p>
+        <p id="guessProgressLabel" style="text-align: center;">Guesses Used: 0/0</p>
+        <progress id="guessProgressBar" value="0" max="100"></progress>
+        <div id="messageContainer" style="text-align: center;">
+            <!-- Penalty and Multiplier Messages -->
+            <div id="penaltyMessage" class="message-box hidden"></div>
+            <div id="multiplierMessage" class="message-box hidden"></div>
+        </div>
+        <button class="btn" id="submitGuessButton" onclick="checkGuess()">Submit Guess</button>
+    </div>
+
+    <!-- Leaderboard Frame -->
+    <div id="leaderboardFrame" class="frame">
+        <div class="header">
+            <button class="back-button" onclick="switchFrame('userMenuFrame')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Leaderboard</h2>
+        </div>
+        <input type="text" id="leaderboardSearch" class="input-field" placeholder="Search...">
+        <table id="leaderboardTable">
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Points</th>
+            </tr>
+            <!-- Leaderboard content will be injected here -->
+        </table>
+    </div>
+
+    <!-- Past Scores Frame -->
+    <div id="pastScoresFrame" class="frame">
+        <div class="header">
+            <button class="back-button" onclick="switchFrame('userMenuFrame')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Past Scores</h2>
+        </div>
+        <div class="search-filter-container">
+            <input type="text" id="pastScoresSearch" class="input-field" placeholder="Search...">
+            <button id="toggleFiltersButton" class="btn-filter" type="button">Filters</button>
+        </div>
+        <div id="filterOptions" class="hidden">
+            <div class="chip-container">
+                <span class="filter-chip active" data-difficulty="Easy">Easy</span>
+                <span class="filter-chip active" data-difficulty="Normal">Normal</span>
+                <span class="filter-chip active" data-difficulty="Difficult">Difficult</span>
+                <span class="filter-chip active" data-difficulty="Hell">Hell</span>
+                <span class="filter-chip active" data-difficulty="Godly">Godly</span>
+            </div>
+        </div>
+        <table id="pastScoresTable">
+            <tr>
+                <th>#</th>
+                <th>Difficulty</th>
+                <th>Attempts</th>
+                <th>Points</th>
+            </tr>
+            <!-- Past scores content will be injected here -->
+        </table>
+    </div>
+
+    <!-- Welcome Back Frame -->
+    <div id="welcomeBackFrame" class="frame">
+        <h2 id="welcomeLabel">Welcome back!</h2>
+        <p id="loadingMessageLabel">Initializing Systems...</p>
+        <progress id="progressBar" value="0" max="100"></progress>
+    </div>
+
+    <!-- Post Game Frame -->
+    <div id="postGameFrame" class="frame">
+        <h2>Calculating Score...</h2>
+        <p id="postGameProgressLabel">Running machine learning models...</p>
+        <progress id="postGameProgressBar" value="0" max="100"></progress>
+    </div>
+
+    <!-- Final Stats Frame -->
+    <div id="finalStatsFrame" class="frame">
+        <h2>Score Report</h2>
+        <div id="finalStatsContent">
+            <!-- Final stats chips will be injected here -->
+        </div>
+        <div id="finalStatsMessageContainer" style="text-align: center;">
+            <div id="penaltyNote" class="message-box hidden"></div>
+            <div id="multiplierNote" class="message-box hidden"></div>
+        </div>
+        <button class="btn" onclick="switchBackToMenu()">Back to Menu</button>
+    </div>
+
+
+    <!-- Session Reset Frame -->
+    <div id="sessionResetFrame" class="frame">
+        <h2>Resetting Session...</h2>
+        <p id="sessionResetProgressLabel">Cleaning up...</p>
+        <progress id="sessionResetProgressBar" value="0" max="100"></progress>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div id="customAlert" class="modal hidden">
+        <div class="modal-content alert-modal">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3 class="modal-title">Alert</h3>
+            </div>
+            <p id="alertMessage" class="modal-message"></p>
+            <button class="btn" id="alertOkButton" type="button">OK</button>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="customConfirm" class="modal hidden">
+        <div class="modal-content confirm-modal">
+            <div class="modal-header">
+                <i class="fas fa-question-circle"></i>
+                <h3 class="modal-title">Confirmation</h3>
+            </div>
+            <p id="confirmMessage" class="modal-message"></p>
+            <div class="modal-buttons">
+                <button class="btn" id="confirmYes" type="button">Yes</button>
+                <button class="btn btn-secondary" id="confirmNo" type="button">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2024 The Guessing Game. All rights reserved.
+    </div>
+
+    <script>
+        // JavaScript code starts here
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDBsv2VRdfogPOW4U00l3pa9SiwhbQde6o",
+            authDomain: "guessing-game-71eea.firebaseapp.com",
+            databaseURL: "https://guessing-game-71eea-default-rtdb.firebaseio.com",
+            projectId: "guessing-game-71eea",
+            storageBucket: "guessing-game-71eea.appspot.com",
+            messagingSenderId: "988746312616",
+            appId: "1:988746312616:web:72cae19d6727a2424e4b9d",
+            measurementId: "G-9CTLR7116D"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        const auth = firebase.auth();
+
+        // Test Firebase Initialization
+        if (firebase.apps.length === 0) {
+            console.error('Firebase not initialized!');
+        } else {
+            console.log('Firebase initialized successfully.');
+        }
+
+        // Global Variables
+        var credentials = {};
+        var userScores = {};
+        var winStreaks = {};
+        var userMoney = {};
+        var betAmount = 0;
+
+
+        var previousGuesses = [];
+        var currentUser = null;
+        var currentUserName = '';
+        var pointsPenaltyFactor = 1.0;
+        var legion = -1;
+        var numberToGuess = 0;
+        var attempts = 0;
+        var totalAttempts = 0;
+        var rangeSize = 0;
+        var difficultyFactor = 1.0;
+        var difficulty = 'Normal';
+        var winstreakMultiplierApplied = 1; // Holds the applied winstreak multiplier
+        var confirmCallback = null;
+        var difficultySettings = {
+            'Easy': 1.1,
+            'Normal': 1,
+            'Difficult': 0.95,
+            'Hell': 0.90,
+            'Godly': 0.85
+        };
+        var difficultyScoreMultiplier = {
+            'Easy': 0.5,
+            'Normal': 1,
+            'Difficult': 1.5,
+            'Hell': 2,
+            'Godly': 3
+        };
+        var loadingMessages = [
+            'Authorizing user identification...',
+            'Loading system registry...',
+            'Encrypting SSL keys...',
+            'Generating encryption algorithms...',
+            'Compiling API protocols...',
+            'Optimizing neural network...',
+            'Compiling machine learning models...',
+            'Indexing database shards...',
+            'Initializing API gateways...',
+            'Loading user interface components...',
+            'Finalizing UI threads...',
+            'Loading [COMPLETE]...'
+        ];
+        var postGameJargon = [
+            'Analyzing player input...',
+            'Optimizing scoring algorithm...',
+            'Running machine learning models to evaluate performance...',
+            'Compiling game history...',
+            'Calculating final score...',
+            'Finalizing analysis...',
+            'Score calculation [COMPLETE]'
+        ];
+        var resetMessages = [
+            'Clearing session data...',
+            'Resetting session variables...',
+            'Clearing game state...',
+            'Logging out user...',
+            'Finalizing reset...',
+            'Session reset complete!'
+        ];
+
+        // Existing functions and code...
+
+        function showAlert(message, callback) {
+            var customAlert = document.getElementById('customAlert');
+            var alertMessage = document.getElementById('alertMessage');
+
+            alertMessage.textContent = message;
+            customAlert.classList.remove('hidden');
+
+            var alertOkButton = document.getElementById('alertOkButton');
+
+            // Remove previous event listener
+            var newAlertOkButton = alertOkButton.cloneNode(true);
+            alertOkButton.parentNode.replaceChild(newAlertOkButton, alertOkButton);
+
+            newAlertOkButton.addEventListener('click', function () {
+                customAlert.classList.add('hidden');
+                if (callback) callback();
+            });
+        }
+
+        // Declare confirmCallback as a global variable at the top of your script
+        var confirmCallback = null;
+
+        function showConfirm(message, options = {}) {
+            var customConfirm = document.getElementById('customConfirm');
+            var confirmMessage = document.getElementById('confirmMessage');
+            var confirmIcon = customConfirm.querySelector('.modal-header i');
+            var confirmTitle = customConfirm.querySelector('.modal-title');
+
+            confirmMessage.innerHTML = message;
+
+            // Customize icon and title
+            confirmIcon.className = options.iconClass || 'fas fa-question-circle';
+            confirmTitle.textContent = options.title || 'Confirmation';
+
+            customConfirm.classList.remove('hidden');
+
+            // Store the callback function globally
+            confirmCallback = options.callback || null;
+
+            // Assign click events to the modal buttons
+            var confirmYes = document.getElementById('confirmYes');
+            var confirmNo = document.getElementById('confirmNo');
+
+            // Remove previous event listeners by cloning nodes
+            var newConfirmYes = confirmYes.cloneNode(true);
+            var newConfirmNo = confirmNo.cloneNode(true);
+            confirmYes.parentNode.replaceChild(newConfirmYes, confirmYes);
+            confirmNo.parentNode.replaceChild(newConfirmNo, confirmNo);
+
+            // Assign event listeners to the new buttons
+            newConfirmYes.addEventListener('click', function () {
+                customConfirm.classList.add('hidden');
+                if (confirmCallback) {
+                    confirmCallback(true);
+                    confirmCallback = null; // Reset the callback
+                }
+            });
+
+            newConfirmNo.addEventListener('click', function () {
+                customConfirm.classList.add('hidden');
+                if (confirmCallback) {
+                    confirmCallback(false);
+                    confirmCallback = null; // Reset the callback
+                }
+            });
+        }
+
+        function loadUserMoney() {
+            var storedMoney = localStorage.getItem('userMoney');
+            if (storedMoney) {
+                userMoney = JSON.parse(storedMoney);
+            }
+        }
+
+        function saveUserMoney() {
+            localStorage.setItem('userMoney', JSON.stringify(userMoney));
+        }
+
+        // Load data from localStorage
+        function loadCredentials() {
+            var storedCredentials = localStorage.getItem('credentials');
+            if (storedCredentials) {
+                credentials = JSON.parse(storedCredentials);
+            }
+        }
+
+        function saveCredentials() {
+            localStorage.setItem('credentials', JSON.stringify(credentials));
+        }
+
+        function loadUserScores() {
+            var storedScores = localStorage.getItem('userScores');
+            if (storedScores) {
+                userScores = JSON.parse(storedScores);
+            }
+        }
+
+        function saveUserScores() {
+            localStorage.setItem('userScores', JSON.stringify(userScores));
+        }
+
+        function loadWinStreaks() {
+            var storedWinStreaks = localStorage.getItem('winStreaks');
+            if (storedWinStreaks) {
+                winStreaks = JSON.parse(storedWinStreaks);
+            }
+        }
+
+        function saveWinStreaks() {
+            localStorage.setItem('winStreaks', JSON.stringify(winStreaks));
+        }
+
+        // Hashing function for passwords
+        async function hashPassword(password) {
+            const msgUint8 = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        // Switch frames
+        function switchFrame(frameId) {
+            var frames = ['mainMenuFrame', 'signupFrame', 'loginFrame', 'userMenuFrame', 'leaderboardFrame', 'gameFrame', 'gameGuessFrame', 'welcomeBackFrame', 'pastScoresFrame', 'postGameFrame', 'finalStatsFrame', 'sessionResetFrame', 'shopFrame'];
+            for (var i = 0; i < frames.length; i++) {
+                document.getElementById(frames[i]).style.display = 'none';
+            }
+            document.getElementById(frameId).style.display = 'block';
+        }
+
+        // Sign Up
+        function signUp() {
+            switchFrame('signupFrame');
+        }
+
+        async function submitSignup() {
+            var username = document.getElementById('signupUsername').value.trim();
+            var password = document.getElementById('signupPassword').value;
+
+            if (!username || !password) {
+                showAlert('Please enter a valid username and password.');
+                return;
+            }
+
+            try {
+                // Create user with email and password
+                const userCredential = await auth.createUserWithEmailAndPassword(username + '@example.com', password);
+                const user = userCredential.user;
+
+                // Save additional user data to Firebase Realtime Database
+                var userRef = firebase.database().ref('users/' + user.uid);
+                userRef.set({
+                    username: username,
+                    userScores: [],
+                    winStreak: 0,
+                    userMoney: 0
+                });
+
+                // Clear the signup fields
+                document.getElementById('signupUsername').value = '';
+                document.getElementById('signupPassword').value = '';
+
+                // Automatically log in the user
+                currentUser = user.uid;
+
+                // Proceed to the welcome back frame
+                showWelcomeBackFrame(username);
+            } catch (error) {
+                console.error('Error during sign up:', error);
+                showAlert('An error occurred during sign up: ' + error.message);
+            }
+        }
+
+        // Log In
+        function logIn() {
+            switchFrame('loginFrame');
+        }
+
+        function startPeriodicSave() {
+            setInterval(function () {
+                if (currentUser) {
+                    // Save data to Firebase
+                    var userRef = firebase.database().ref('users/' + currentUser);
+                    userRef.set({
+                        username: currentUserName,
+                        userScores: userScores[currentUser] || [],
+                        winStreak: winStreaks[currentUser] || 0,
+                        userMoney: userMoney[currentUser] || 0
+                    });
+                }
+            }, 300000); // Save every 5 minutes
+        }
+
+        async function submitLogin() {
+            var username = document.getElementById('loginUsername').value.trim();
+            var password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                showAlert('Please enter your username and password.');
+                return;
+            }
+
+            try {
+                // Sign in with email and password
+                const userCredential = await auth.signInWithEmailAndPassword(username + '@example.com', password);
+                const user = userCredential.user;
+                currentUser = user.uid;
+
+                // Load user data from Firebase
+                var userRef = firebase.database().ref('users/' + currentUser);
+                userRef.once('value').then(function (snapshot) {
+                    var data = snapshot.val();
+                    if (data) {
+                        userScores[currentUser] = data.userScores || [];
+                        winStreaks[currentUser] = data.winStreak || 0;
+                        userMoney[currentUser] = data.userMoney || 0;
+                        data.username = data.username || username;
+                    } else {
+                        // If no data exists, initialize it
+                        userScores[currentUser] = [];
+                        winStreaks[currentUser] = 0;
+                        userMoney[currentUser] = 0;
+                        data.username = username;
+                    }
+
+                    // Store the username for display purposes
+                    currentUserName = data.username;
+
+                    // Proceed to user menu
+                    userMenu();
+                    showWelcomeBackFrame(currentUserName);
+                }).catch(function (error) {
+                    console.error('Error fetching user data:', error);
+                    showAlert('An error occurred while loading your data.');
+                });
+
+                // Start periodic save
+                startPeriodicSave();
+            } catch (error) {
+                console.error('Error during login:', error);
+                showAlert('Invalid username or password.');
+            }
+        }
+
+        // Welcome Back Frame
+        function showWelcomeBackFrame(username) {
+            document.getElementById('welcomeLabel').textContent = 'Welcome, ' + username + '!';
+            document.getElementById('progressBar').value = 0;
+            document.getElementById('loadingMessageLabel').textContent = 'Initializing Systems...';
+            switchFrame('welcomeBackFrame');
+            updateProgressBar(0);
+        }
+
+        function updateProgressBar(value) {
+            if (value <= 100) {
+                document.getElementById('progressBar').value = value;
+                var messageIndex = Math.min(Math.floor(value / 10), loadingMessages.length - 1);
+                document.getElementById('loadingMessageLabel').textContent = loadingMessages[messageIndex];
+                setTimeout(function () {
+                    updateProgressBar(value + 5);
+                }, 100);
+            } else {
+                switchToUserMenu();
+            }
+        }
+
+        function switchToUserMenu() {
+            userMenu();
+        }
+
+        function updateLeaderboard(totalScore) {
+            var leaderboardRef = firebase.database().ref('leaderboard/' + currentUser);
+            leaderboardRef.set({
+                username: currentUserName,
+                totalScore: totalScore
+            });
+        }
+
+        // User Menu
+        function userMenu() {
+            // Calculate user's total points
+            var totalScore = 0;
+            if (userScores[currentUser]) {
+                for (var i = 0; i < userScores[currentUser].length; i++) {
+                    var game = userScores[currentUser][i];
+                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
+                        totalScore += game.score;
+                    }
+                }
+            }
+
+            // Get all scores and determine the user's position
+            var allScores = [];
+            for (var user in userScores) {
+                var userTotal = 0;
+                for (var j = 0; j < userScores[user].length; j++) {
+                    var game = userScores[user][j];
+                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
+                        userTotal += game.score;
+                    }
+                }
+                allScores.push({ user: user, score: userTotal });
+            }
+            allScores.sort(function (a, b) {
+                return b.score - a.score;
+            });
+            var position = null;
+            for (var i = 0; i < allScores.length; i++) {
+                if (allScores[i].user === currentUser) {
+                    position = i + 1;
+                    break;
+                }
+            }
+
+            // Determine the class for the points chip based on leaderboard position
+            var pointsClass = 'default';
+            if (position === 1) {
+                pointsClass = 'gold';
+            } else if (position === 2) {
+                pointsClass = 'silver';
+            } else if (position === 3) {
+                pointsClass = 'bronze';
+            }
+
+            var winStreak = winStreaks[currentUser] || 0;
+            var money = userMoney[currentUser] || 0;
+
+            document.getElementById('userMenuLabel').textContent = currentUserName + "'s User Menu";
+
+            var userPointsChip = document.getElementById('userPointsChip');
+            userPointsChip.innerHTML = '<i class="fas fa-star"></i> Total Points: ' + formatScore(totalScore);
+            userPointsChip.className = 'info-chip ' + pointsClass;
+
+            var userMoneyChip = document.getElementById('userMoneyChip');
+            userMoneyChip.innerHTML = '<i class="fas fa-coins"></i> Money: ' + formatMoney(money);
+            userMoneyChip.className = 'info-chip greener';
+
+            var winStreakChip = document.getElementById('winStreakChip');
+            winStreakChip.innerHTML = '<i class="fas fa-fire"></i> Win Streak: ' + winStreak;
+            winStreakChip.className = 'info-chip orange';
+
+            switchFrame('userMenuFrame');
+        }
+        // Format Money
+        function formatMoney(amount) {
+            return '$' + amount.toFixed(2);
+        }
+        // Open Shop
+        function openShop() {
+            var totalScore = 0;
+            if (userScores[currentUser]) {
+                for (var i = 0; i < userScores[currentUser].length; i++) {
+                    var game = userScores[currentUser][i];
+                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
+                        totalScore += game.score;
+                    }
+                }
+            }
+            var money = userMoney[currentUser] || 0;
+
+            // Update the chips
+            document.getElementById('shopPointsDisplay').textContent = formatScore(totalScore);
+            document.getElementById('shopMoneyDisplay').textContent = formatMoney(money);
+
+            document.getElementById('pointsToConvert').value = '';
+            switchFrame('shopFrame');
+        }
+
+        // Convert Points to Money
+        function convertPointsToMoney() {
+            var pointsToConvert = parseInt(document.getElementById('pointsToConvert').value);
+            if (isNaN(pointsToConvert) || pointsToConvert <= 0) {
+                showAlert('Please enter a valid number of points to convert.');
+                return;
+            }
+
+            var totalScore = 0;
+            if (userScores[currentUser]) {
+                for (var i = 0; i < userScores[currentUser].length; i++) {
+                    var game = userScores[currentUser][i];
+                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
+                        totalScore += game.score;
+                    }
+                }
+            }
+
+            if (pointsToConvert > totalScore) {
+                showAlert('You do not have enough points to convert.');
+                return;
+            }
+
+            var moneyGained = pointsToConvert / 1000;
+            userMoney[currentUser] = (userMoney[currentUser] || 0) + moneyGained;
+
+            // Deduct points
+            var pointsLeft = pointsToConvert;
+            for (var i = userScores[currentUser].length - 1; i >= 0 && pointsLeft > 0; i--) {
+                var game = userScores[currentUser][i];
+                if (game.score > 0) {
+                    if (game.score >= pointsLeft) {
+                        game.score -= pointsLeft;
+                        pointsLeft = 0;
+                    } else {
+                        pointsLeft -= game.score;
+                        game.score = 0;
+                    }
+                }
+            }
+
+            saveUserScores();
+            saveUserMoney();
+            openShop();
+            showAlert('Conversion successful! You gained ' + formatMoney(moneyGained) + '.');
+        }
+
+
+        // Format Score
+        // Format Score
+        function formatScore(score) {
+            // Ensure the score is a valid number
+            if (typeof score !== 'number' || isNaN(score)) {
+                return '0'; // Default to '0' if the score is invalid
+            }
+
+            var thresholds = [
+                { threshold: 1e18, suffix: 'Sx' },
+                { threshold: 1e15, suffix: 'Qi' },
+                { threshold: 1e12, suffix: 'T' },
+                { threshold: 1e9, suffix: 'B' },
+                { threshold: 1e6, suffix: 'M' },
+                { threshold: 1e3, suffix: 'K' },
+            ];
+            for (var i = 0; i < thresholds.length; i++) {
+                if (score >= thresholds[i].threshold) {
+                    return (score / thresholds[i].threshold).toFixed(1) + ' ' + thresholds[i].suffix;
+                }
+            }
+            return score.toString();
+        }
+
+        // Start New Game
+        function startNewGame() {
+            switchFrame('gameFrame');
+        }
+
+        // Submit Game Setup
+        function submitGame() {
+            var minValue = parseInt(document.getElementById('entryMin').value);
+            var maxValue = parseInt(document.getElementById('entryMax').value);
+            betAmount = parseFloat(document.getElementById('betAmount').value) || 0;
+
+            if (isNaN(minValue) || isNaN(maxValue)) {
+                showAlert('Please enter valid numeric values for the range.');
+                return;
+            }
+            if (minValue < 0 || maxValue < 0) {
+                showAlert('Negative numbers are not allowed.');
+                return;
+            }
+            if (minValue >= maxValue) {
+                showAlert('Minimum value cannot be larger than or equal to the maximum value.');
+                return;
+            }
+            if (betAmount < 0) {
+                showAlert('Bet amount cannot be negative.');
+                return;
+            }
+            var availableMoney = userMoney[currentUser] || 0;
+            if (betAmount > availableMoney) {
+                showAlert('You do not have enough money to place that bet.');
+                return;
+            }
+
+            // Deduct the bet amount upfront
+            if (betAmount > 0) {
+                //userMoney[currentUser] -= betAmount;
+                console.log("userMoneyBefore" + userMoney[currentUser]);
+                saveUserMoney();
+            }
+
+            rangeSize = maxValue - minValue + 1;
+            difficulty = document.getElementById('difficultySelect').value;
+
+            if (rangeSize < 25) {
+
+                showConfirm(`
+            <strong>Range Less Than 25</strong>
+            <ul class="modal-list">
+                <li>Difficult set to "Easy".</li>
+                <li>50% Point Penalty</li>
+                <li>Score Factors Reduced.</li>
+                <li>Win streak will not increase.</li>
+                <li>Score will be significantly lower.</li>
+            </ul>
+            Do you wish to proceed?
+        `, {
+                    iconClass: 'fas fa-exclamation-triangle',
+
+                    title: 'Range Too Small',
+                    callback: function (result) {
+                        if (result) {
+                            difficulty = 'Easy';
+                            document.getElementById('difficultySelect').value = 'Easy';
+                            pointsPenaltyFactor = 0.5;
+                            console.log(pointsPenaltyFactor);
+                            proceedWithGameSetup();
+                        } else {
+                            document.getElementById('entryMin').value = '';
+                            document.getElementById('entryMax').value = '';
+                            document.getElementById('difficultySelect').value = 'Normal';
+                        }
+                    }
+                });
+                return; // Prevent further execution until user responds
+            } else if (difficulty === 'Easy' && rangeSize >= 25) {
+                showConfirm(`
+            <strong>Easy Mode Nerfs:</strong>
+            <ul class="modal-list">
+                <li>Score Factors Reduced.</li>
+                <li>Win streak will not increase.</li>
+                <li>Score will be significantly lower.</li>
+            </ul>
+            Do you wish to continue with Easy Mode?
+        `, {
+                    iconClass: 'fas fa-exclamation-triangle',
+                    title: 'Easy Mode Warning',
+                    callback: function (result) {
+                        if (result) {
+                            proceedWithGameSetup();
+                            pointsPenaltyFactor = 0.5;
+                        } else {
+                            document.getElementById('entryMin').value = '';
+                            document.getElementById('entryMax').value = '';
+                            document.getElementById('difficultySelect').value = 'Normal';
+                        }
+                    }
+                });
+                return;
+            } else {
+                pointsPenaltyFactor = 1.0;
+                proceedWithGameSetup();
+            }
+
+            // Helper function to proceed with game setup
+            function proceedWithGameSetup() {
+                numberToGuess = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
+                console.log(numberToGuess);
+                previousGuesses = [];
+                difficultyFactor = difficultySettings[difficulty];
+                totalAttempts = Math.max(Math.floor(difficultyFactor * largestPowerOf2(rangeSize)), 5);
+                attempts = totalAttempts;
+                document.getElementById('submitGuessButton').disabled = false;
+                document.getElementById('guessProgressBar').value = 0;
+                document.getElementById('guessProgressLabel').textContent = 'Guesses Used: 0/' + totalAttempts;
+                showPenaltyAndMultiplierMessages()
+                switchFrame('gameGuessFrame');
+            }
+        }
+
+        // Largest Power of 2
+        function largestPowerOf2(n) {
+            if (n < 1) return 0;
+            return Math.floor(Math.log2(n));
+        }
+
+        // Update checkGuess function
+        function checkGuess() {
+            var guess = parseInt(document.getElementById('entryGuess').value);
+            if (isNaN(guess)) {
+                showAlert('Please enter a valid number.');
+                return;
+            }
+            if (previousGuesses.includes(guess)) {
+                document.getElementById('feedbackLabel').textContent = 'You already guessed that number!';
+                document.getElementById('feedbackLabel').className = 'message error';
+                return;
+            }
+            previousGuesses.push(guess);
+            attempts--;
+
+            if (guess === numberToGuess) {
+                document.getElementById('feedbackLabel').textContent = 'Congratulations! You guessed the correct number: ' + numberToGuess + '.';
+                document.getElementById('feedbackLabel').className = 'message success';
+
+                difficulty = document.getElementById('difficultySelect').value;
+                var difficultyMultiplier = difficultyScoreMultiplier[difficulty];
+                var points;
+
+                // Calculate points based on difficulty
+                if (difficulty === 'Easy') {
+                    points = Math.floor(((attempts + 1) / totalAttempts) * 100 * difficultyMultiplier * pointsPenaltyFactor);
+                } else {
+                    var winstreak = Math.max(winStreaks[currentUser], 1);
+                    points = Math.floor(((attempts + 1) / totalAttempts) * 100 * winstreak * rangeSize * difficultyMultiplier * pointsPenaltyFactor);
+                }
+
+                legion = points;
+
+                // Add points to the user score and handle win streaks
+                handleWinAndSave(points);
+
+                // Proceed to the score report
+                setTimeout(function () {
+                    switchFrame('postGameFrame');
+                    updatePostGameProgress(0);
+                }, 3000); // Wait for 3 seconds before switching frames
+
+            } else if (guess < numberToGuess) {
+                document.getElementById('feedbackLabel').textContent = 'The number is higher.';
+                document.getElementById('feedbackLabel').className = 'message error';
+            } else {
+                document.getElementById('feedbackLabel').textContent = 'The number is lower.';
+                document.getElementById('feedbackLabel').className = 'message error';
+            }
+
+            updateGuessProgress();
+
+            // Check if out of attempts
+            if (attempts === 0 && guess !== numberToGuess) {
+                document.getElementById('feedbackLabel').textContent = 'Game over! The number was ' + numberToGuess + '.';
+                document.getElementById('feedbackLabel').className = 'message error';
+
+                var points = 0; // No points earned for an incorrect guess
+
+                legion = points;
+
+                handleLossAndSave(points);
+
+                // Delay before proceeding to the score report screen
+                setTimeout(function () {
+                    switchFrame('postGameFrame');
+                    updatePostGameProgress(0);
+                }, 3000); // Wait for 3 seconds before switching frames
+            }
+        }
+
+        function calculateTotalScore() {
+            var totalScore = 0;
+            if (userScores[currentUser]) {
+                for (var i = 0; i < userScores[currentUser].length; i++) {
+                    var game = userScores[currentUser][i];
+                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
+                        totalScore += game.score;
+                    }
+                }
+            }
+            return totalScore;
+        }
+
+        // Function to handle win and save points
+        function handleWinAndSave(points) {
+            var moneyEarned = points * 0.01;
+            if (betAmount > 0) {
+                console.log(betAmount);
+                moneyEarned += betAmount;
+
+            }
+
+            userMoney[currentUser] = (userMoney[currentUser] || 0) + moneyEarned;
+            saveUserMoney();
+
+            userScores[currentUser].push({
+                'score': points,
+                'difficulty': difficulty,
+                'attempts': (totalAttempts - attempts) + '/' + totalAttempts,
+                'betAmount': betAmount // Save betAmount with the game data
+            });
+
+
+            saveUserScores();
+            betAmount = 0;
+
+            updateWinstreak(true);
+            saveWinStreaks();
+
+            var userRef = firebase.database().ref('users/' + currentUser);
+            userRef.set({
+                username: currentUser,
+                userScores: userScores[currentUser] || [],
+                winStreak: winStreaks[currentUser] || 0,
+                userMoney: userMoney[currentUser] || 0
+            });
+
+            var totalScore = calculateTotalScore();
+            updateLeaderboard(totalScore);
+        }
+
+        // Function to handle loss and save points
+        function handleLossAndSave(points) {
+            var moneyLost = 0;
+            if (betAmount > 0) {
+                moneyLost = betAmount; // The bet amount is lost.
+                console.log("Lost" + moneyLost);
+                userMoney[currentUser] = (userMoney[currentUser] || 0) - moneyLost;
+                betAmount = 0;
+                saveUserMoney();
+            }
+
+            userScores[currentUser].push({
+                'score': points,
+                'difficulty': difficulty,
+                'attempts': '0/' + totalAttempts,
+                'moneyLost': moneyLost, // Store the lost money if applicable
+                'betAmount': betAmount // Save betAmount with the game data
+            });
+            saveUserScores();
+
+            updateWinstreak(false);
+            saveWinStreaks();
+
+            var userRef = firebase.database().ref('users/' + currentUser);
+            userRef.set({
+                username: currentUser,
+                userScores: userScores[currentUser] || [],
+                winStreak: winStreaks[currentUser] || 0,
+                userMoney: userMoney[currentUser] || 0
+            });
+
+            var totalScore = calculateTotalScore();
+            updateLeaderboard(totalScore);
+        }
+
+        // Update showPenaltyAndMultiplierMessages function
+        function showPenaltyAndMultiplierMessages() {
+            var penaltyMessage = document.getElementById('penaltyMessage');
+            var multiplierMessage = document.getElementById('multiplierMessage');
+
+            // Reset messages
+            penaltyMessage.className = 'message-box hidden';
+            multiplierMessage.className = 'message-box hidden';
+
+            // Check if a 50% point penalty applies
+            if (pointsPenaltyFactor === 0.5) {
+                penaltyMessage.textContent = '50% Point Penalty Applied';
+                penaltyMessage.classList.remove('hidden');
+                penaltyMessage.classList.add('red');
+            }
+
+            // Check if a win streak multiplier applies and if the win streak is greater than zero
+            if (winstreakMultiplierApplied > 1 && winStreaks[currentUser] > 0 && difficulty !== 'Easy') {
+                multiplierMessage.textContent = 'Win Streak Multiplier Applied';
+                multiplierMessage.classList.remove('hidden');
+                multiplierMessage.classList.add('green');
+            }
+        }
+        function updateGuessProgress() {
+            var progress = ((totalAttempts - attempts) / totalAttempts) * 100;
+            document.getElementById('guessProgressBar').value = progress;
+            document.getElementById('guessProgressLabel').textContent = 'Guesses Used: ' + (totalAttempts - attempts) + '/' + totalAttempts;
+        }
+
+        // Update Win Streak
+        function updateWinstreak(won) {
+            if (won) {
+                if (difficulty !== 'Easy') {
+                    winStreaks[currentUser] += 1;
+                }
+            } else {
+                winStreaks[currentUser] = 0;
+            }
+            saveWinStreaks();
+            showPenaltyAndMultiplierMessages(); // Ensure the messages are updated based on the new win streak value
+        }
+
+        // Post Game Progress
+        function updatePostGameProgress(value) {
+            if (value <= 100) {
+                document.getElementById('postGameProgressBar').value = value;
+                var messageIndex = Math.min(Math.floor(value / 15), postGameJargon.length - 1);
+                document.getElementById('postGameProgressLabel').textContent = postGameJargon[messageIndex];
+                var delay = value < 100 ? 500 : 2000;
+                setTimeout(function () {
+                    updatePostGameProgress(value + 5);
+                }, delay);
+            } else {
+                setTimeout(function () {
+                    showFinalStatsScreen();
+                }, 2000);
+            }
+        }
+
+        function showFinalStatsScreen() {
+            winstreakMultiplierApplied = Math.max(winStreaks[currentUser], 1);
+            switchFrame('finalStatsFrame');
+
+            var finalStatsContent = document.getElementById('finalStatsContent');
+            finalStatsContent.innerHTML = '';
+
+            difficulty = document.getElementById('difficultySelect').value;
+            var difficultyMultiplier = difficultyScoreMultiplier[difficulty];
+
+            // Calculate total points and leaderboard position
+            var totalPoints = 0;
+            if (userScores[currentUser]) {
+                for (var i = 0; i < userScores[currentUser].length; i++) {
+                    var game = userScores[currentUser][i];
+                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
+                        totalPoints += game.score;
+                    }
+                }
+            }
+
+            // Get total money and money earned/lost in the current round
+            var totalMoney = userMoney[currentUser] || 0;
+            var moneyEarned = legion * 0.01;
+            var lastGame = userScores[currentUser][userScores[currentUser].length - 1];
+            var betAmount = lastGame.betAmount || 0;
+            var moneyLost = lastGame.moneyLost || 0;
+            console.log("Pre Bet" + moneyEarned);
+            moneyEarned += betAmount;
+            console.log("Post Bet" + moneyEarned);
+            console.log(betAmount);
+            console.log(betAmount);
+
+            // Determine the class and text for the Money Earned/Lost chip
+            var moneyClass = 'greener';
+            var moneyText = 'Money Earned: ';
+            if (moneyLost > 0) {
+                moneyEarned = moneyLost;
+                moneyClass = 'points-none'; // Red if the bet was lost.
+                moneyText = 'Money Lost: ';
+                //moneyEarned = moneyLost * 2; // Display the lost money as positive without a negative sign.
+            } else if (betAmount > 0) {
+                console.log(moneyEarned);
+                //moneyEarned += betAmount * 2; // Add winnings from the bet if applicable.
+                //console.log(betAmount);
+            }
+
+            // Get all scores and determine the user's position
+            var allScores = [];
+            for (var user in userScores) {
+                var userTotal = 0;
+                for (var j = 0; j < userScores[user].length; j++) {
+                    var game = userScores[user][j];
+                    if (typeof game === 'object' && game.hasOwnProperty('score')) {
+                        userTotal += game.score;
+                    }
+                }
+                allScores.push({ user: user, score: userTotal });
+            }
+            allScores.sort(function (a, b) {
+                return b.score - a.score;
+            });
+            var position = null;
+            for (var i = 0; i < allScores.length; i++) {
+                if (allScores[i].user === currentUser) {
+                    position = i + 1;
+                    break;
+                }
+            }
+
+            // Determine the class for the points chip based on leaderboard position
+            var pointsClass = 'default';
+            if (position === 1) {
+                pointsClass = 'gold';
+            } else if (position === 2) {
+                pointsClass = 'silver';
+            } else if (position === 3) {
+                pointsClass = 'bronze';
+            }
+
+            // Determine the class for the difficulty chip
+            var difficultyClass = 'default';
+            switch (difficulty) {
+                case 'Easy':
+                    difficultyClass = 'green';
+                    break;
+                case 'Normal':
+                    difficultyClass = 'default';
+                    break;
+                case 'Difficult':
+                    difficultyClass = 'yellow';
+                    break;
+                case 'Hell':
+                    difficultyClass = 'red';
+                    break;
+                case 'Godly':
+                    difficultyClass = 'purple';
+                    break;
+            }
+
+            // Determine the class for the points earned chip based on the points earned in the current round
+            var pointsEarnedClass = 'points-none';
+            if (legion > 1000) {
+                pointsEarnedClass = 'points-high';
+            } else if (legion > 500) {
+                pointsEarnedClass = 'points-medium';
+            } else if (legion > 0) {
+                pointsEarnedClass = 'points-low';
+            }
+
+            var currentWinstreak = winStreaks[currentUser] || 0;
+
+            // Create chips for the final stats
+            var content = '<div class="chip-container">';
+
+            // Difficulty Chip
+            content += '<div class="info-chip ' + difficultyClass + '">';
+            content += '<i class="fas fa-tachometer-alt"></i> Difficulty: <span>' + difficulty + '</span>';
+            content += '</div>';
+            content += '</div>'; // Close first chip-container
+
+            // Second row: Leaderboard Position
+            content += '<div class="chip-container">';
+            content += '<div class="info-chip ' + pointsClass + '">';
+            content += '<i class="fas fa-trophy"></i> Leaderboard Position: <span class="animated-number" data-target="' + position + '">0</span>';
+            content += '</div>';
+            content += '</div>'; // Close second chip-container
+
+            // Third row: Total Points and Money
+            content += '<div class="chip-container">';
+            content += '<div class="info-chip">';
+            content += '<i class="fas fa-star"></i> Total Points: <span class="animated-number" data-target="' + totalPoints + '">0</span>';
+            content += '</div>';
+
+            content += '<div class="info-chip greener">';
+            content += '<i class="fas fa-coins"></i> Money: <span class="animated-number" data-target="' + totalMoney + '">0</span>';
+            content += '</div>';
+            content += '</div>'; // Close third chip-container
+
+            // Fourth row: Points Earned and Money Earned
+            content += '<div class="chip-container">';
+            content += '<div class="info-chip ' + pointsEarnedClass + '">';
+            content += '<i class="fas fa-plus-circle"></i> Points Earned: <span class="animated-number" data-target="' + legion + '">0</span>';
+            content += '</div>';
+
+            content += '<div class="info-chip ' + moneyClass + '">';
+            content += '<i class="fas fa-dollar-sign"></i>' + moneyText + '<span class="animated-number" data-target="' + moneyEarned.toFixed(2) + '">0</span>';
+            content += '</div>';
+            content += '</div>'; // Close fourth chip-container
+
+            // Fifth row: Win Streak
+            content += '<div class="chip-container">';
+            content += '<div class="info-chip orange">';
+            content += '<i class="fas fa-fire"></i> Win Streak: <span class="animated-number" data-target="' + currentWinstreak + '">0</span>';
+            content += '</div>';
+            content += '</div>'; // Close fifth chip-container
+
+            finalStatsContent.innerHTML = content;
+
+            // Start the number animations
+            animateNumbers();
+
+            // Show or hide penalty and multiplier notes
+            var penaltyNote = document.getElementById('penaltyNote');
+            var multiplierNote = document.getElementById('multiplierNote');
+
+            // Reset notes
+            penaltyNote.className = 'message-box hidden';
+            multiplierNote.className = 'message-box hidden';
+
+            // Check if a 50% point penalty was applied
+            if (pointsPenaltyFactor === 0.5) {
+                penaltyNote.textContent = 'Note: 50% Point Penalty was applied.';
+                penaltyNote.classList.remove('hidden');
+                penaltyNote.classList.add('red');
+            }
+
+            // Check if a win streak multiplier was applied
+            if (winstreakMultiplierApplied > 1 && difficulty !== 'Easy') {
+                multiplierNote.textContent = 'Note: Win Streak Multiplier was applied.';
+                multiplierNote.classList.remove('hidden');
+                multiplierNote.classList.add('green');
+            }
+        }
+
+        // Function to animate numbers
+        // Function to animate numbers
+        // Function to animate numbers
+        function animateNumbers() {
+            var animatedNumbers = document.querySelectorAll('.animated-number');
+            animatedNumbers.forEach(function (el) {
+                var target = +el.getAttribute('data-target');
+                var count = 0;
+                var increment = target / 100; // Adjust the speed here
+                var speed = 15; // Adjust the animation speed here (lower is faster)
+
+                function updateNumber() {
+                    count += increment;
+                    if (count >= target) {
+                        el.textContent = formatScore(target);
+                    } else {
+                        el.textContent = formatScore(Math.floor(count));
+                        setTimeout(updateNumber, speed);
+                    }
+                }
+                updateNumber();
+            });
+        }
+
+        // Switch Back to Menu
+        function switchBackToMenu() {
+            resetGame();
+            userMenu();
+            switchFrame('userMenuFrame');
+        }
+
+        function backToMenuFromGame() {
+            showConfirm('Are you sure you want to exit? Your score will be voided.', {
+                iconClass: 'fas fa-power-off',
+                title: 'Exit Game',
+                callback: function (result) {
+                    if (result) {
+                        resetGame();
+                        switchFrame('userMenuFrame');
+                    }
+                }
+            });
+        }
+
+        // Reset Game
+        function resetGame() {
+            numberToGuess = 0;
+            attempts = 0;
+            totalAttempts = 0;
+            previousGuesses = [];
+            document.getElementById('entryMin').value = '';
+            document.getElementById('entryMax').value = '';
+            document.getElementById('betAmount').value = '';
+            document.getElementById('entryGuess').value = '';
+            document.getElementById('pointsToConvert').value = '';
+            document.getElementById('feedbackLabel').textContent = '';
+            document.getElementById('guessProgressBar').value = 0;
+            document.getElementById('guessProgressLabel').textContent = 'Guesses Used: 0/0';
+            document.getElementById('difficultySelect').value = 'Normal';
+        }
+
+        // Handle Logout
+        function handleLogout() {
+            // Save data to Firebase
+            if (currentUser) {
+                var userRef = firebase.database().ref('users/' + currentUser);
+                userRef.set({
+                    username: currentUserName,
+                    userScores: userScores[currentUser] || [],
+                    winStreak: winStreaks[currentUser] || 0,
+                    userMoney: userMoney[currentUser] || 0
+                });
+            }
+
+            // Sign out from Firebase Authentication
+            auth.signOut().then(function () {
+                // Proceed with logout
+                switchFrame('sessionResetFrame');
+                updateResetProgress(0);
+            }).catch(function (error) {
+                console.error('Error during logout:', error);
+                showAlert('An error occurred during logout.');
+            });
+        }
+
+        function updateResetProgress(value) {
+            if (value <= 100) {
+                document.getElementById('sessionResetProgressBar').value = value;
+                var messageIndex = Math.min(Math.floor(value / 20), resetMessages.length - 1);
+                document.getElementById('sessionResetProgressLabel').textContent = resetMessages[messageIndex];
+                setTimeout(function () {
+                    updateResetProgress(value + 20);
+                }, 200);
+            } else {
+                resetSession();
+                switchFrame('mainMenuFrame');
+            }
+        }
+
+        function resetSession() {
+            currentUser = null;
+            attempts = 0;
+            numberToGuess = 0;
+            totalAttempts = 0;
+            previousGuesses = [];
+
+            // Clear input fields
+            document.getElementById('entryMin').value = '';
+            document.getElementById('entryMax').value = '';
+            document.getElementById('entryGuess').value = '';
+            document.getElementById('betAmount').value = '';
+            document.getElementById('pointsToConvert').value = '';
+            document.getElementById('signupUsername').value = '';
+            document.getElementById('signupPassword').value = '';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+
+            document.getElementById('feedbackLabel').textContent = '';
+            document.getElementById('guessProgressBar').value = 0;
+            document.getElementById('guessProgressLabel').textContent = 'Guesses Used: 0/0';
+            document.getElementById('difficultySelect').value = 'Normal';
+        }
+
+        var leaderboardSearchEventListenerAdded = false;
+
+        function setupLeaderboardSearch(username, loggedIn) {
+            if (leaderboardSearchEventListenerAdded) return;
+
+            var searchInput = document.getElementById('leaderboardSearch');
+
+            // Event listener for search input
+            searchInput.addEventListener('input', function () {
+                var searchTerm = searchInput.value.trim();
+                showLeaderboard(username, loggedIn, searchTerm);
+            });
+
+            leaderboardSearchEventListenerAdded = true;
+        }
+
+
+
+        function showLeaderboard(username, loggedIn, searchTerm = '') {
+            var leaderboardTable = document.getElementById('leaderboardTable');
+            leaderboardTable.innerHTML = '<tr><th>Rank</th><th>User</th><th>Points</th></tr>';
+
+            firebase.database().ref('leaderboard').once('value').then(function (snapshot) {
+                var leaderboardData = snapshot.val();
+                var allScores = [];
+
+                for (var userId in leaderboardData) {
+                    var entry = leaderboardData[userId];
+                    allScores.push({ user: entry.username, score: entry.totalScore });
+                }
+
+                // Apply search term filtering if necessary
+                if (searchTerm) {
+                    allScores = allScores.filter(entry => entry.user.toLowerCase().includes(searchTerm.toLowerCase()));
+                }
+
+                // Sort and display the leaderboard
+                allScores.sort(function (a, b) {
+                    return b.score - a.score;
+                });
+
+                for (var i = 0; i < Math.min(100, allScores.length); i++) {
+                    var entry = allScores[i];
+                    var row = leaderboardTable.insertRow();
+                    var cell1 = row.insertCell(0); // Rank
+                    var cell2 = row.insertCell(1); // User
+                    var cell3 = row.insertCell(2); // Points
+
+                    cell1.textContent = i + 1;
+                    cell2.textContent = entry.user;
+                    cell3.textContent = formatScore(entry.score);
+
+                    // Apply color coding based on rank
+                    if (i === 0) {
+                        row.style.color = 'gold';
+                    } else if (i === 1) {
+                        row.style.color = 'silver';
+                    } else if (i === 2) {
+                        row.style.color = '#cd7f32'; // Bronze color
+                    } else {
+                        row.style.color = '#f0f0f0';
+                    }
+                }
+
+                var backButton = document.querySelector('#leaderboardFrame .back-button');
+                if (loggedIn) {
+                    backButton.onclick = function () { switchFrame('userMenuFrame'); };
+                } else {
+                    backButton.onclick = function () { switchFrame('mainMenuFrame'); };
+                }
+
+                switchFrame('leaderboardFrame');
+            }).catch(function (error) {
+                console.error('Error fetching leaderboard data:', error);
+                showAlert('An error occurred while loading the leaderboard.');
+            });
+        }
+
+
+
+        function applyPastScoresFilters() {
+            var searchTerm = document.getElementById('pastScoresSearch').value.trim();
+            var filterChips = document.querySelectorAll('.filter-chip.active');
+            var difficultyFilters = [];
+
+            filterChips.forEach(function (chip) {
+                difficultyFilters.push(chip.getAttribute('data-difficulty'));
+            });
+
+            // Re-display the past scores with the applied filters
+            showPastScores(searchTerm, difficultyFilters);
+        }
+
+
+        var pastScoresEventListenersAdded = false;
+
+        function setupPastScoresSearchAndFilters() {
+            if (pastScoresEventListenersAdded) return;
+
+            var searchInput = document.getElementById('pastScoresSearch');
+            var filterChips = document.querySelectorAll('.filter-chip');
+            var toggleFiltersButton = document.getElementById('toggleFiltersButton');
+            var filterOptions = document.getElementById('filterOptions');
+
+            // Event listener for search input
+            searchInput.addEventListener('input', function () {
+                applyPastScoresFilters();
+            });
+
+            // Event listeners for filter chips
+            filterChips.forEach(function (chip) {
+                chip.addEventListener('click', function () {
+                    chip.classList.toggle('active');
+                    applyPastScoresFilters();
+                });
+            });
+
+            // Event listener for Filters button
+            toggleFiltersButton.addEventListener('click', function () {
+                filterOptions.classList.toggle('hidden');
+                filterOptions.classList.toggle('show');
+            });
+
+            pastScoresEventListenersAdded = true;
+        }
+
+        // Show Past Scores
+        function showPastScores(searchTerm = '', difficultyFilters = []) {
+            var pastScoresTable = document.getElementById('pastScoresTable');
+            pastScoresTable.innerHTML = '<tr><th>#</th><th>Difficulty</th><th>Attempts</th><th>Points</th></tr>';
+
+            if (userScores[currentUser]) {
+                // Assign original indices to each game
+                var allGames = userScores[currentUser].map(function (game, index) {
+                    game.originalIndex = index + 1; // Add 1 to start from 1 instead of 0
+                    return game;
+                });
+
+                // Apply filters
+                var filteredScores = allGames.filter(function (game) {
+                    // Apply difficulty filters
+                    if (difficultyFilters.length > 0 && !difficultyFilters.includes(game.difficulty)) {
+                        return false;
+                    }
+                    // Apply search term filter
+                    if (searchTerm) {
+                        var searchRegex = new RegExp(searchTerm, 'i');
+                        return searchRegex.test(game.difficulty) || searchRegex.test(game.attempts) || searchRegex.test(game.score ? game.score.toString() : '');
+                    }
+                    return true;
+                });
+
+                // Display filtered results using original indices
+                for (var i = 0; i < filteredScores.length; i++) {
+                    var game = filteredScores[i];
+                    var row = pastScoresTable.insertRow();
+                    var cell1 = row.insertCell(0); // #
+                    var cell2 = row.insertCell(1); // Difficulty
+                    var cell3 = row.insertCell(2); // Attempts
+                    var cell4 = row.insertCell(3); // Points
+
+                    cell1.textContent = game.originalIndex;
+                    cell2.textContent = game.difficulty || 'Unknown';
+                    cell3.textContent = game.attempts || 'N/A';
+                    cell4.textContent = formatScore(game.score);
+
+                    // Apply color coding based on difficulty
+                    switch (game.difficulty) {
+                        case 'Easy':
+                            row.style.color = '#06d6a0';
+                            break;
+                        case 'Normal':
+                            row.style.color = '#f0f0f0';
+                            break;
+                        case 'Difficult':
+                            row.style.color = '#ffd166';
+                            break;
+                        case 'Hell':
+                            row.style.color = '#ff006e';
+                            break;
+                        case 'Godly':
+                            row.style.color = '#8338ec';
+                            break;
+                        default:
+                            row.style.color = '#f0f0f0'; // Default color
+                    }
+                }
+            }
+
+            // Add event listeners for search and filters
+            setupPastScoresSearchAndFilters();
+
+            switchFrame('pastScoresFrame');
+        }
+
+        // Quit the Game
+        function quit() {
+            showConfirm('Are you sure you want to quit?', {
+                iconClass: 'fas fa-power-off',
+                title: 'Quit Game',
+                callback: function (result) {
+                    if (result) {
+                        // Since window.close() may not work, you can redirect to a different page or display a message
+                        window.close(); // Redirects to a blank page
+                    }
+                }
+            });
+        }
+        // Get references to the confirm buttons
+        var confirmYes = document.getElementById('confirmYes');
+        var confirmNo = document.getElementById('confirmNo');
+
+        // Assign event listeners
+        confirmYes.addEventListener('click', function () {
+            var customConfirm = document.getElementById('customConfirm');
+            customConfirm.classList.add('hidden');
+            if (confirmCallback) {
+                confirmCallback(true);
+                confirmCallback = null; // Reset the callback
+            }
+        });
+
+        confirmNo.addEventListener('click', function () {
+            var customConfirm = document.getElementById('customConfirm');
+            customConfirm.classList.add('hidden');
+            if (confirmCallback) {
+                confirmCallback(false);
+                confirmCallback = null; // Reset the callback
+            }
+        });
+
+
+        // Rest of your JavaScript code...
+
+        // Initialize
+        loadCredentials();
+        loadUserScores();
+        loadWinStreaks();
+        loadUserMoney();
+
+        // JavaScript code ends here
+    </script>
+</body>
+
+</html>
