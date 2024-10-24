@@ -1918,7 +1918,7 @@
 
             // Determine the class for the money earned/lost chip
             var moneyClass = moneyLost > 0 ? 'points-none' : 'greener'; // red for loss, green for earnings
-            var moneyText = moneyLost > 0 ? `Money Lost: -${formatScore(moneyLost)}` : `Money Earned: ${formatScore(pointsEarned * 0.01)}`;
+            var moneyText = moneyLost > 0 ? `Money Lost: -${formatScore(Math.round(moneyLost))}` : `Money Earned: ${formatScore(Math.round(pointsEarned * 0.01))}`;
 
             // Create and display the final stats content
             var content = `
