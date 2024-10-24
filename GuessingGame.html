@@ -1880,6 +1880,8 @@
 
             var currentWinstreak = winStreaks[currentUser] || 0;
             var totalMoney = userMoney[currentUser] || 0;
+            console.log(userMoney[currentUser] + " " + totalMoney)
+            console.log(formatScore(Math.round(totalMoney)))
             var lastGame = userScores[currentUser][userScores[currentUser].length - 1];
             var pointsEarned = lastGame.score || 0;
             var betAmount = lastGame.betAmount || 0;
