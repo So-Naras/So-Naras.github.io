@@ -747,7 +747,7 @@
             </div>
         </div>
         <label for="pointsToConvert">Convert Points to Money</label>
-        <p style="text-align: center;">(1 Money = 1000 Points)</p>
+        <p style="text-align: center;">(100 points = $1)</p>
         <input type="number" id="pointsToConvert" class="input-field" placeholder="Enter Points to Convert">
         <button class="btn" onclick="convertPointsToMoney()">Convert</button>
     </div>
@@ -1403,7 +1403,7 @@
                 return;
             }
 
-            var moneyGained = pointsToConvert / 1000;
+            var moneyGained = pointsToConvert / 100;
             userMoney[currentUser] = (userMoney[currentUser] || 0) + moneyGained;
 
             // Deduct points
