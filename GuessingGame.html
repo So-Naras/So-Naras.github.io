@@ -1341,7 +1341,7 @@
                 userPointsChip.className = 'info-chip ' + pointsClass;
 
                 var userMoneyChip = document.getElementById('userMoneyChip');
-                userMoneyChip.innerHTML = '<i class="fas fa-coins"></i> Money: ' + formatScore(formatMoney(money));
+                userMoneyChip.innerHTML = '<i class="fas fa-coins"></i> Money: ' + formatMoney(money);
                 userMoneyChip.className = 'info-chip greener';
 
                 var winStreakChip = document.getElementById('winStreakChip');
@@ -1357,7 +1357,7 @@
         }
         // Format Money
         function formatMoney(amount) {
-            return '$' + amount.toFixed(2);
+            return '$' + amount.toFixed(0);
         }
         // Open Shop
         function openShop() {
