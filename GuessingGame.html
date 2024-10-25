@@ -13,6 +13,18 @@
             box-sizing: border-box;
         }
 
+        #gameFrame .header h2 {
+            margin-bottom: 0px;
+            /* Remove space below the "Enter Game Settings" header */
+        }
+
+        #gameFrame .chip-container {
+            margin-top: 0px;
+            /* Remove space above the money chip container */
+            margin-bottom: 10px;
+            /* Optional: Adjust this to control spacing below the chip */
+        }
+
         #finalStatsContent {
             text-align: center;
         }
@@ -680,7 +692,7 @@
         <h1>The Guessing Game</h1>
         <button class="btn" onclick="signUp()">Sign Up</button>
         <button class="btn" onclick="logIn()">Log In</button>
-        <button class="btn" onclick="showLeaderboard(null, false)">Show Leaderboard</button>
+        <button class="btn" onclick="promptLeaderboard(null, false)">Leaderboards</button> <!-- Updated -->
         <button class="btn btn-danger" onclick="quit()">Quit</button>
     </div>
 
@@ -726,7 +738,7 @@
         <button class="btn" onclick="startNewGame()">Start New Game</button>
         <button class="btn" onclick="openShop()">Shop</button>
         <button class="btn" onclick="showPastScores()">View Past Scores</button>
-        <button class="btn" onclick="showLeaderboard(currentUser, true)">View Leaderboard</button>
+        <button class="btn" onclick="promptLeaderboard(currentUser, true)">Leaderboards</button> <!-- Updated -->
         <button class="btn btn-danger" onclick="handleLogout()">Logout</button>
     </div>
 
@@ -747,7 +759,7 @@
             </div>
         </div>
         <label for="pointsToConvert">Convert Points to Money</label>
-        <p style="text-align: center;">(100 points = $1)</p>
+        <p style="text-align: center;">(1 Money = 1000 Points)</p>
         <input type="number" id="pointsToConvert" class="input-field" placeholder="Enter Points to Convert">
         <button class="btn" onclick="convertPointsToMoney()">Convert</button>
     </div>
@@ -758,6 +770,11 @@
             <button class="back-button" onclick="switchFrame('userMenuFrame')"><i
                     class="fas fa-arrow-left"></i></button>
             <h2>Enter Game Settings</h2>
+        </div>
+        <div class="chip-container">
+            <div id="availableMoneyChip" class="info-chip greener">
+                <i class="fas fa-coins"></i> Available Money: <span id="availableMoneyAmount">$0.00</span>
+            </div>
         </div>
         <label for="entryMin">Min Value</label>
         <input type="text" id="entryMin" class="input-field">
@@ -797,7 +814,7 @@
     <!-- Leaderboard Frame -->
     <div id="leaderboardFrame" class="frame">
         <div class="header">
-            <button class="back-button" onclick="switchFrame('userMenuFrame')">
+            <button class="back-button" onclick="switchFrame('userMenuFrame'), resetSearch()">
                 <i class="fas fa-arrow-left"></i>
             </button>
             <h2>Leaderboard</h2>
@@ -810,6 +827,24 @@
                 <th>Points</th>
             </tr>
             <!-- Leaderboard content will be injected here -->
+        </table>
+    </div>
+    <!-- Money Leaderboard Frame -->
+    <div id="moneyLeaderboardFrame" class="frame">
+        <div class="header">
+            <button class="back-button" onclick="switchFrame('userMenuFrame'), resetSearch()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Money Leaderboard</h2>
+        </div>
+        <input type="text" id="moneyLeaderboardSearch" class="input-field" placeholder="Search...">
+        <table id="moneyLeaderboardTable">
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Money</th>
+            </tr>
+            <!-- Money leaderboard content will be injected here -->
         </table>
     </div>
 
@@ -1056,6 +1091,10 @@
             confirmYes.parentNode.replaceChild(newConfirmYes, confirmYes);
             confirmNo.parentNode.replaceChild(newConfirmNo, confirmNo);
 
+            // Set custom button labels if provided
+            newConfirmYes.textContent = options.confirmButtonText || 'Yes';
+            newConfirmNo.textContent = options.cancelButtonText || 'No';
+
             // Assign event listeners to the new buttons
             newConfirmYes.addEventListener('click', function () {
                 customConfirm.classList.add('hidden');
@@ -1128,13 +1167,47 @@
             return hashHex;
         }
 
+        function resetSearch() {
+            var leaderboardSearch = document.getElementById('leaderboardSearch');
+            if (leaderboardSearch) {
+                leaderboardSearch.value = '';
+            }
+
+            var moneyLeaderboardSearch = document.getElementById('moneyLeaderboardSearch');
+            if (moneyLeaderboardSearch) {
+                moneyLeaderboardSearch.value = '';
+            }
+
+            var pastScoresSearch = document.getElementById('pastScoresSearch');
+            if (pastScoresSearch) {
+                pastScoresSearch.value = '';
+            }
+        }
+
         // Switch frames
         function switchFrame(frameId) {
-            var frames = ['mainMenuFrame', 'signupFrame', 'loginFrame', 'userMenuFrame', 'leaderboardFrame', 'gameFrame', 'gameGuessFrame', 'welcomeBackFrame', 'pastScoresFrame', 'postGameFrame', 'finalStatsFrame', 'sessionResetFrame', 'shopFrame'];
+            var frames = [
+                'mainMenuFrame', 'signupFrame', 'loginFrame', 'userMenuFrame',
+                'leaderboardFrame', 'gameFrame', 'gameGuessFrame', 'welcomeBackFrame',
+                'pastScoresFrame', 'postGameFrame', 'finalStatsFrame',
+                'sessionResetFrame', 'shopFrame', 'moneyLeaderboardFrame'
+            ];
+
+            // Hide all frames
             for (var i = 0; i < frames.length; i++) {
                 document.getElementById(frames[i]).style.display = 'none';
             }
+
+            // Show the target frame
             document.getElementById(frameId).style.display = 'block';
+
+            // Reset search inputs if switching to Main Menu or User Menu
+            if (frameId === 'mainMenuFrame' || frameId === 'userMenuFrame') {
+                resetSearch();
+            }
+
+            // Update the currentFrame variable
+            currentFrame = frameId;
         }
 
         // Sign Up
@@ -1282,7 +1355,8 @@
             var leaderboardRef = firebase.database().ref('leaderboard/' + currentUser);
             leaderboardRef.set({
                 username: currentUserName,
-                totalScore: totalScore
+                totalScore: totalScore,
+                money: userMoney[currentUser] || 0 // Ensure money is stored
             });
         }
 
@@ -1291,10 +1365,9 @@
             // Update other parts of the user menu with the latest score
         }
 
-
-
         // User Menu
         function userMenu() {
+            resetSearch();
             // Calculate user's total points
             var totalScore = calculateTotalScore();
 
@@ -1341,7 +1414,7 @@
                 userPointsChip.className = 'info-chip ' + pointsClass;
 
                 var userMoneyChip = document.getElementById('userMoneyChip');
-                userMoneyChip.innerHTML = '<i class="fas fa-coins"></i> Money: ' + formatScore(Math.round(money));
+                userMoneyChip.innerHTML = '<i class="fas fa-coins"></i> Money: ' + formatScore(money);
                 userMoneyChip.className = 'info-chip greener';
 
                 var winStreakChip = document.getElementById('winStreakChip');
@@ -1357,7 +1430,7 @@
         }
         // Format Money
         function formatMoney(amount) {
-            return '$' + amount.toFixed(0);
+            return '$' + amount.toFixed(2);
         }
         // Open Shop
         function openShop() {
@@ -1403,7 +1476,7 @@
                 return;
             }
 
-            var moneyGained = pointsToConvert / 100;
+            var moneyGained = pointsToConvert / 1000;
             userMoney[currentUser] = (userMoney[currentUser] || 0) + moneyGained;
 
             // Deduct points
@@ -1429,7 +1502,6 @@
 
 
         // Format Score
-        // Format Score
         function formatScore(score) {
             // Ensure the score is a valid number
             if (typeof score !== 'number' || isNaN(score)) {
@@ -1454,6 +1526,10 @@
 
         // Start New Game
         function startNewGame() {
+
+            var availableMoney = userMoney[currentUser] || 0;
+            document.getElementById('availableMoneyAmount').textContent = formatMoney(availableMoney);
+
             switchFrame('gameFrame');
         }
 
@@ -1496,16 +1572,16 @@
 
             if (rangeSize < 25) {
                 showConfirm(`
-            <strong>Range Less Than 25</strong>
-            <ul class="modal-list">
-                <li>Difficult set to "Easy".</li>
-                <li>50% Point Penalty</li>
-                <li>Score Factors Reduced.</li>
-                <li>Win streak will not increase.</li>
-                <li>Score will be significantly lower.</li>
-            </ul>
-            Do you wish to proceed?
-        `, {
+                    <strong>Range Less Than 25</strong>
+                    <ul class="modal-list">
+                        <li>Difficult set to "Easy".</li>
+                        <li>50% Point Penalty</li>
+                        <li>Score Factors Reduced.</li>
+                        <li>Win streak will not increase.</li>
+                        <li>Score will be significantly lower.</li>
+                    </ul>
+                    Do you wish to proceed?
+                `, {
                     iconClass: 'fas fa-exclamation-triangle',
                     title: 'Range Too Small',
                     callback: function (result) {
@@ -1524,14 +1600,14 @@
                 return;
             } else if (difficulty === 'Easy' && rangeSize >= 25) {
                 showConfirm(`
-            <strong>Easy Mode Nerfs:</strong>
-            <ul class="modal-list">
-                <li>Score Factors Reduced.</li>
-                <li>Win streak will not increase.</li>
-                <li>Score will be significantly lower.</li>
-            </ul>
-            Do you wish to continue with Easy Mode?
-        `, {
+                    <strong>Easy Mode Nerfs:</strong>
+                    <ul class="modal-list">
+                        <li>Score Factors Reduced.</li>
+                        <li>Win streak will not increase.</li>
+                        <li>Score will be significantly lower.</li>
+                    </ul>
+                    Do you wish to continue with Easy Mode?
+                `, {
                     iconClass: 'fas fa-exclamation-triangle',
                     title: 'Easy Mode Warning',
                     callback: function (result) {
@@ -1603,17 +1679,19 @@
                 if (difficulty === 'Easy') {
                     points = Math.floor(((attempts + 1) / totalAttempts) * 100 * difficultyMultiplier * pointsPenaltyFactor);
                 } else {
-                    var winstreak = Math.max(winStreaks[currentUser], 1);
+                    var winstreak = Math.max(winStreaks[currentUser] || 0, 1);
                     points = Math.floor(((attempts + 1) / totalAttempts) * 100 * winstreak * rangeSize * difficultyMultiplier * pointsPenaltyFactor);
                 }
 
                 legion = points;
 
+                document.getElementById('submitGuessButton').disabled = true;
+
                 // Add points to the user score and handle win streaks
                 handleWinAndSave(points);
 
                 // Update win streak and show messages
-                // updateWinstreak(true);
+                updateWinstreak(true);
 
                 showPenaltyAndMultiplierMessages(); // Ensure the multiplier message is shown
 
@@ -1643,6 +1721,8 @@
 
                 var points = 0; // No points for an incorrect guess
                 legion = points;
+
+                document.getElementById('submitGuessButton').disabled = true;
 
                 handleLossAndSave(points);
 
@@ -1711,6 +1791,14 @@
 
             var totalScore = calculateTotalScore();
             updateLeaderboard(totalScore);
+
+            // Update the leaderboard with money data
+            var leaderboardRef = firebase.database().ref('leaderboard/' + currentUser);
+            leaderboardRef.set({
+                username: currentUserName,
+                totalScore: totalScore,
+                money: userMoney[currentUser] || 0 // Add money data here
+            });
         }
 
         // Function to handle loss and save points
@@ -1880,8 +1968,6 @@
 
             var currentWinstreak = winStreaks[currentUser] || 0;
             var totalMoney = userMoney[currentUser] || 0;
-            console.log(userMoney[currentUser] + " " + totalMoney)
-            console.log(formatScore(Math.round(totalMoney)))
             var lastGame = userScores[currentUser][userScores[currentUser].length - 1];
             var pointsEarned = lastGame.score || 0;
             var betAmount = lastGame.betAmount || 0;
@@ -1920,42 +2006,42 @@
 
             // Determine the class for the money earned/lost chip
             var moneyClass = moneyLost > 0 ? 'points-none' : 'greener'; // red for loss, green for earnings
-            var moneyText = moneyLost > 0 ? `Money Lost: -${formatScore(Math.round(moneyLost))}` : `Money Earned: ${formatScore(Math.round(pointsEarned * 0.01))}`;
+            var moneyText = moneyLost > 0 ? `Money Lost: -${formatScore(moneyLost)}` : `Money Earned: ${formatScore(pointsEarned * 0.01)}`;
 
             // Create and display the final stats content
             var content = `
-        <div class="chip-container">
-            <div class="info-chip ${difficultyClass}">
-                <i class="fas fa-tachometer-alt"></i> Difficulty: <span>${difficulty}</span>
-            </div>
-        </div>
-        <div class="chip-container">
-            <div class="info-chip ${pointsClass}">
-                <i class="fas fa-trophy"></i> Leaderboard Position: <span class="animated-number" data-target="${position}">0</span>
-            </div>
-        </div>
-        <div class="chip-container">
-            <div class="info-chip">
-                <i class="fas fa-star"></i> Total Points: <span class="animated-number" data-target="${totalPoints}">0</span>
-            </div>
-            <div class="info-chip greener">
-                <i class="fas fa-coins"></i> Total Money: <span class="animated-number" data-target="${totalMoney}">0</span>
-            </div>
-        </div>
-        <div class="chip-container">
-            <div class="info-chip ${pointsEarnedClass}">
-                <i class="fas fa-plus-circle"></i> Points Earned: <span class="animated-number" data-target="${pointsEarned}">0</span>
-            </div>
-            <div class="info-chip ${moneyClass}">
-                <i class="fas fa-dollar-sign"></i> ${moneyText}
-            </div>
-        </div>
-        <div class="chip-container">
-            <div class="info-chip orange">
-                <i class="fas fa-fire"></i> Win Streak: <span class="animated-number" data-target="${currentWinstreak}">0</span>
-            </div>
-        </div>
-    `;
+                <div class="chip-container">
+                    <div class="info-chip ${difficultyClass}">
+                        <i class="fas fa-tachometer-alt"></i> Difficulty: <span>${difficulty}</span>
+                    </div>
+                </div>
+                <div class="chip-container">
+                    <div class="info-chip ${pointsClass}">
+                        <i class="fas fa-trophy"></i> Leaderboard Position: <span class="animated-number" data-target="${position}">0</span>
+                    </div>
+                </div>
+                <div class="chip-container">
+                    <div class="info-chip">
+                        <i class="fas fa-star"></i> Total Points: <span class="animated-number" data-target="${totalPoints}">0</span>
+                    </div>
+                    <div class="info-chip greener">
+                        <i class="fas fa-coins"></i> Total Money: <span class="animated-number" data-target="${totalMoney}">0</span>
+                    </div>
+                </div>
+                <div class="chip-container">
+                    <div class="info-chip ${pointsEarnedClass}">
+                        <i class="fas fa-plus-circle"></i> Points Earned: <span class="animated-number" data-target="${pointsEarned}">0</span>
+                    </div>
+                    <div class="info-chip ${moneyClass}">
+                        <i class="fas fa-dollar-sign"></i> ${moneyText}
+                    </div>
+                </div>
+                <div class="chip-container">
+                    <div class="info-chip orange">
+                        <i class="fas fa-fire"></i> Win Streak: <span class="animated-number" data-target="${currentWinstreak}">0</span>
+                    </div>
+                </div>
+            `;
 
             finalStatsContent.innerHTML = content;
 
@@ -1990,8 +2076,6 @@
             }
         }
 
-        // Function to animate numbers
-        // Function to animate numbers
         // Function to animate numbers
         function animateNumbers() {
             var animatedNumbers = document.querySelectorAll('.animated-number');
@@ -2049,6 +2133,8 @@
             document.getElementById('guessProgressBar').value = 0;
             document.getElementById('guessProgressLabel').textContent = 'Guesses Used: 0/0';
             document.getElementById('difficultySelect').value = 'Normal';
+
+
         }
 
         // Handle Logout
@@ -2115,8 +2201,27 @@
             document.getElementById('guessProgressBar').value = 0;
             document.getElementById('guessProgressLabel').textContent = 'Guesses Used: 0/0';
             document.getElementById('difficultySelect').value = 'Normal';
+
+            resetSearch();
         }
 
+        function promptLeaderboard(username, loggedIn) {
+            showConfirm('Which leaderboard would you like to view?', {
+                iconClass: 'fas fa-trophy', // Optional: Change icon as desired
+                title: 'Select Leaderboard',
+                confirmButtonText: 'Points',
+                cancelButtonText: 'Money',
+                callback: function (result) {
+                    if (result) {
+                        showLeaderboard(username, loggedIn); // Show Points Leaderboard
+                    } else {
+                        showMoneyLeaderboard(username, loggedIn); // Show Money Leaderboard
+                    }
+                }
+            });
+        }
+
+        // Setup Leaderboard Search
         var leaderboardSearchEventListenerAdded = false;
 
         function setupLeaderboardSearch(username, loggedIn) {
@@ -2133,11 +2238,12 @@
             leaderboardSearchEventListenerAdded = true;
         }
 
-
-
         function showLeaderboard(username, loggedIn, searchTerm = '') {
             var leaderboardTable = document.getElementById('leaderboardTable');
-            leaderboardTable.innerHTML = '<tr><th>Rank</th><th>User</th><th>Points</th></tr>';
+            // Clear existing rows except header
+            while (leaderboardTable.rows.length > 1) {
+                leaderboardTable.deleteRow(1);
+            }
 
             firebase.database().ref('leaderboard').once('value').then(function (snapshot) {
                 var leaderboardData = snapshot.val();
@@ -2153,11 +2259,12 @@
                     allScores = allScores.filter(entry => entry.user.toLowerCase().includes(searchTerm.toLowerCase()));
                 }
 
-                // Sort and display the leaderboard
+                // Sort scores in descending order
                 allScores.sort(function (a, b) {
                     return b.score - a.score;
                 });
 
+                // Populate the leaderboard table with sorted data
                 for (var i = 0; i < Math.min(100, allScores.length); i++) {
                     var entry = allScores[i];
                     var row = leaderboardTable.insertRow();
@@ -2195,7 +2302,78 @@
             });
         }
 
+        // Setup Money Leaderboard Search
+        function setupMoneyLeaderboardSearch(username, loggedIn) {
+            var searchInput = document.getElementById('moneyLeaderboardSearch');
+            searchInput.addEventListener('input', function () {
+                var searchTerm = searchInput.value.trim();
+                showMoneyLeaderboard(username, loggedIn, searchTerm);
+            });
+        }
 
+
+        // Show Money Leaderboard
+        function showMoneyLeaderboard(username, loggedIn, searchTerm = '') {
+            var moneyLeaderboardTable = document.getElementById('moneyLeaderboardTable');
+
+            // Clear the existing rows first
+            while (moneyLeaderboardTable.rows.length > 1) {
+                moneyLeaderboardTable.deleteRow(1); // Leave the header row intact
+            }
+
+            firebase.database().ref('leaderboard').once('value').then(function (snapshot) {
+                var leaderboardData = snapshot.val();
+                var allMoneyData = [];
+
+                // Check each user’s data in the leaderboard to ensure it has the "money" field
+                for (var userId in leaderboardData) {
+                    var entry = leaderboardData[userId];
+                    if (entry.money !== undefined) {
+                        allMoneyData.push({ user: entry.username, money: entry.money });
+                    }
+                }
+
+                // Apply search term filtering if necessary
+                if (searchTerm) {
+                    allMoneyData = allMoneyData.filter(entry => entry.user.toLowerCase().includes(searchTerm.toLowerCase()));
+                }
+
+                // Sort by money in descending order
+                allMoneyData.sort(function (a, b) {
+                    return b.money - a.money;
+                });
+
+                // Populate the leaderboard table with sorted data
+                for (var i = 0; i < Math.min(100, allMoneyData.length); i++) {
+                    var entry = allMoneyData[i];
+                    var row = moneyLeaderboardTable.insertRow();
+                    row.insertCell(0).textContent = i + 1; // Rank
+                    row.insertCell(1).textContent = entry.user; // User
+                    row.insertCell(2).textContent = formatMoney(entry.money); // Money
+
+                    // Apply color coding based on rank
+                    row.style.color = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? '#cd7f32' : '#f0f0f0';
+                }
+
+
+
+                var backButton = document.querySelector('#moneyLeaderboardFrame .back-button');
+                if (loggedIn) {
+                    backButton.onclick = function () {
+                        switchFrame('userMenuFrame');
+                        resetSearch();
+                    };
+                } else {
+                    backButton.onclick = function () { switchFrame('mainMenuFrame'); };
+                }
+
+                // Show the money leaderboard frame
+                switchFrame('moneyLeaderboardFrame');
+            }).catch(function (error) {
+                console.error('Error fetching money leaderboard data:', error);
+                showAlert('An error occurred while loading the money leaderboard.');
+            });
+        }
 
         function applyPastScoresFilters() {
             var searchTerm = document.getElementById('pastScoresSearch').value.trim();
@@ -2348,9 +2526,6 @@
             }
         });
 
-
-        // Rest of your JavaScript code...
-
         // Initialize
         loadCredentials();
         loadUserScores();
@@ -2358,6 +2533,20 @@
         loadUserMoney();
 
         // JavaScript code ends here
+
+        // Initialize Event Listeners on DOM Content Loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Setup search for Money Leaderboard
+            setupMoneyLeaderboardSearch(currentUserName, !!currentUser);
+            // You can choose to display the money leaderboard initially or not
+            // showMoneyLeaderboard();
+
+            // Setup search for Normal Leaderboard
+            setupLeaderboardSearch(currentUserName, !!currentUser); // Pass appropriate parameters
+
+            // If you want to display the normal leaderboard initially, uncomment the following:
+            // showLeaderboard(currentUserName, !!currentUser);
+        });
     </script>
 </body>
 
