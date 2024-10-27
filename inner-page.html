@@ -1,32 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Game Hub</title>
+    <title>Game Hub - K-Games Studios</title>
     <style>
-        /* General Styles */
-        body, html {
+        /* CSS Variables for Easy Theming */
+        :root {
+            --primary-color: #1a1a2e;
+            /* Darker shade for primary elements */
+            --secondary-color: #162447;
+            /* Slightly lighter for secondary elements */
+            --accent-color: #e43f5a;
+            /* Purple tone for accents */
+            --hover-color: #9a031e;
+            /* Darker purple for hover states */
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --transition-speed: 0.3s;
+            --nav-height: 60px;
+            --halo-color: rgba(228, 63, 90, 0.6);
+            /* Purple halo color */
+        }
+
+        /* Reset and Base Styles */
+        * {
             margin: 0;
             padding: 0;
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #141e30, #243b55);
-            color: #ecf0f1;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: auto;
-            padding: 40px;
             box-sizing: border-box;
-            text-align: center;
         }
 
-        h1 {
+        body,
+        html {
+            height: 100%;
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            /* Darker gradient */
+            color: #ffffff;
+            /* White text for contrast */
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            width: 100%;
+            background-color: rgba(26, 26, 46, 0.95);
+            /* Adjusted for darker theme */
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            height: var(--nav-height);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color var(--transition-speed);
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+            transition: color var(--transition-speed);
+        }
+
+        .navbar h1:hover {
+            color: var(--hover-color);
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .navbar ul li a {
+            color: #ffffff;
+            font-size: 16px;
+            transition: color var(--transition-speed), border-bottom var(--transition-speed);
+            padding: 8px 12px;
+            position: relative;
+        }
+
+        /* Underline Hover Animation for Navbar Links */
+        .navbar ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent-color);
+            transition: width var(--transition-speed);
+        }
+
+        .navbar ul li a:hover::after {
+            width: 100%;
+        }
+
+        .navbar ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hamburger Menu (Mobile) */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: #ffffff;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            background-color: var(--primary-color);
+            position: absolute;
+            top: var(--nav-height);
+            right: 0;
+            width: 200px;
+            padding: 10px 0;
+            border-radius: 0 0 0 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .mobile-menu a {
+            padding: 10px 20px;
+            color: #ffffff;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hover Effect for Mobile Menu */
+        .mobile-menu a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent-color);
+            transition: width var(--transition-speed);
+        }
+
+        .mobile-menu a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: url('https://images.unsplash.com/photo-1605902711622-cfb43c4437c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80') center center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-top: var(--nav-height);
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(20, 30, 48, 0.7);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            text-align: center;
+            color: #ffffff;
+            z-index: 1;
+            max-width: 800px;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.6);
+            border-radius: 15px;
+            animation: fadeInUp 1s;
+        }
+
+        .hero-content h1 {
             font-size: 48px;
-            margin-bottom: 50px;
-            animation: fadeInDown 1s;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero-content p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out 0.5s;
+        }
+
+        .hero-content .cta-button {
+            padding: 15px 30px;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed), transform var(--transition-speed), box-shadow var(--transition-speed);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hover Halo Effect for CTA Button */
+
+
+        .cta-button:hover {
+            background-color: var(--hover-color);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--accent-color);
+        }
+
+        /* Floating Geometric Shapes */
+        .floating-elements {
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(228, 63, 90, 0.3);
+            /* Adjusted to match purple theme */
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--accent-color);
+            animation: float 6s ease-in-out infinite, rotate 12s linear infinite;
+        }
+
+        .floating-elements:nth-child(2) {
+            top: 50%;
+            left: 70%;
+            width: 150px;
+            height: 150px;
+            animation-duration: 8s, 16s;
+            background-color: rgba(228, 63, 90, 0.2);
+        }
+
+        .floating-elements:nth-child(3) {
+            top: 30%;
+            left: 40%;
+            width: 80px;
+            height: 80px;
+            animation-duration: 5s, 10s;
+            background-color: rgba(228, 63, 90, 0.25);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Container */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 32px;
+            margin: 40px 0 20px;
+            border-bottom: 2px solid #ecf0f1;
+            display: inline-block;
+            padding-bottom: 10px;
+            animation: fadeInUp 1s;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+            justify-items: center;
         }
 
         /* Game Card Styles */
@@ -34,127 +324,355 @@
             background-color: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 30px;
-            margin: 20px;
-            display: inline-block;
-            width: 300px;
-            vertical-align: top;
+            width: 100%;
+            max-width: 300px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeInUp 1s ease-out;
         }
 
+        /* Hover Effects: Magnify and Glowing Outline */
         .game-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         }
 
+        /* Glowing Outline Around Game Card */
         .game-card::before {
             content: '';
             position: absolute;
-            width: 150%;
-            height: 150%;
-            top: -50%;
-            left: -25%;
-            background: radial-gradient(circle at center, transparent 0%, transparent 70%, rgba(255, 255, 255, 0.2) 70%);
-            transform: rotate(45deg);
-            animation: rotateGlow 5s infinite linear;
+            top: -5px;
+            left: -5px;
+            width: calc(100% + 10px);
+            height: calc(100% + 10px);
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            z-index: -1;
         }
 
-        @keyframes rotateGlow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .game-card:hover::before {
+            opacity: 1;
+            box-shadow: 0 0 15px var(--accent-color), 0 0 30px var(--accent-color);
         }
 
         .game-thumbnail {
             font-size: 80px;
             margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .game-card:hover .game-thumbnail {
+            transform: scale(1.1);
         }
 
         .game-title {
             font-size: 28px;
             margin-bottom: 10px;
+            color: var(--accent-color);
         }
 
         .game-description {
             font-size: 16px;
             line-height: 1.5;
             color: #bdc3c7;
+            min-height: 60px;
+            /* Ensures consistent card height */
         }
 
-        /* Button Styles */
+        /* Button Styles with Glowing Halo on Hover */
         .play-button {
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #27ae60;
-            color: #ecf0f1;
+            background-color: var(--accent-color);
+            color: #ffffff;
             border: none;
             border-radius: 50px;
             font-size: 18px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            text-decoration: none;
-            display: inline-block;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .play-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--halo-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all var(--transition-speed);
+            z-index: -1;
+        }
+
+        .play-button:hover::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
         }
 
         .play-button:hover {
-            background-color: #2ecc71;
+            background-color: var(--hover-color);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--accent-color);
+        }
+
+        /* Bio/About Section */
+        .bio {
+            background-color: rgba(26, 26, 46, 0.6);
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin: 50px auto;
+            text-align: center;
+            max-width: 800px;
+            animation: fadeInUp 1s;
+        }
+
+        .bio h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .bio p {
+            font-size: 16px;
+            color: #bdc3c7;
+            line-height: 1.6;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: var(--primary-color);
+            padding: 20px 0;
+            text-align: center;
+            font-size: 16px;
+            color: #bdc3c7;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 1;
         }
 
         /* Animations */
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-50px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive Styles */
         @media (max-width: 768px) {
+            .navbar ul {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .mobile-menu {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .mobile-menu.active {
+                display: flex;
+            }
+
+            .hero-content {
+                padding: 15px;
+            }
+
+            .hero-content h1 {
+                font-size: 32px;
+            }
+
+            .hero-content p {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .game-title {
+                font-size: 20px;
+            }
+
+            .game-description {
+                font-size: 14px;
+            }
+
+            .bio h2 {
+                font-size: 24px;
+            }
+
+            .bio p {
+                font-size: 14px;
+            }
+
             .game-card {
                 width: calc(100% - 40px);
                 margin: 20px auto;
             }
-
-            h1 {
-                font-size: 36px;
-            }
         }
     </style>
 </head>
+
 <body>
 
-    <div class="container">
-        <h1>Welcome to Game Hub</h1>
-
-        <!-- Guessing Game Card -->
-        <div class="game-card" onclick="location.href='GuessingGame.html'">
-            <div class="game-thumbnail">🎯</div>
-            <div class="game-title">Guessing Game</div>
-            <div class="game-description">
-                Try to guess the secret number in as few attempts as possible! Can you beat your own high score?
-            </div>
-            <a href="GuessingGame.html" class="play-button">Play Now</a>
-        </div>
-
-        <!-- Tic-Tac-Toe Game Card -->
-        <div class="game-card" onclick="location.href='TicTacToe.html'">
-            <div class="game-thumbnail">❌⭕</div>
-            <div class="game-title">Tic-Tac-Toe</div>
-            <div class="game-description">
-                Challenge a friend in this classic game of Tic-Tac-Toe. First to align three symbols wins!
-            </div>
-            <a href="TicTacToe.html" class="play-button">Play Now</a>
-        </div>
-
-        <!-- Rock-Paper-Scissors Game Card -->
-        <div class="game-card" onclick="location.href='RockPaperScissors.html'">
-            <div class="game-thumbnail">🪨📄✂️</div>
-            <div class="game-title">Rock-Paper-Scissors</div>
-            <div class="game-description">
-                The ultimate showdown! Choose your weapon and outsmart your opponent in this timeless game.
-            </div>
-            <a href="RockPaperScissors.html" class="play-button">Play Now</a>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <h1>K-Games Studios</h1>
+        <ul>
+            <li><a href="#recently-added">Recently Added</a></li>
+            <li><a href="#all-games">All Games</a></li>
+            <li><a href="#bio">About Us</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
         </div>
     </div>
 
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#recently-added">Recently Added</a>
+        <a href="#all-games">All Games</a>
+        <a href="#bio">Bio</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <!-- Hero Section with Enhanced Information and Animations -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Game Hub</h1>
+            <p>Discover and play the latest games developed by K-Games Studios. Immerse yourself in a world of
+                creativity and excitement.</p>
+            <a href="#recently-added" class="cta-button">Get Started</a>
+        </div>
+        <!-- Floating Geometric Shapes -->
+        <div class="floating-elements"></div>
+        <div class="floating-elements"></div>
+        <div class="floating-elements"></div>
+    </div>
+
+    <div class="container">
+        <!-- Recently Added Section -->
+        <h2 class="section-title" id="recently-added">Recently Added</h2>
+        <div class="games-grid">
+            <div class="game-card" onclick="location.href='IdleClicker.html'">
+                <div class="game-thumbnail">🕹️</div>
+                <div class="game-title">Idle Clicker</div>
+                <div class="game-description">
+                    Tap and watch your resources grow in Idle Clicker! Upgrade and automate to maximize your earnings.
+                </div>
+                <a href="IdleClicker.html" class="play-button">Play Now</a>
+            </div>
+        </div>
+
+        <!-- All Games Section -->
+        <h2 class="section-title" id="all-games">All Games</h2>
+        <div class="games-grid">
+            <div class="game-card" onclick="location.href='GuessingGame.html'">
+                <div class="game-thumbnail">🎯</div>
+                <div class="game-title">Guessing Game</div>
+                <div class="game-description">
+                    Try to guess the secret number in as few attempts as possible! Can you beat your own high score?
+                </div>
+                <a href="GuessingGame.html" class="play-button">Play Now</a>
+            </div>
+
+            <div class="game-card" onclick="location.href='TicTacToe.html'">
+                <div class="game-thumbnail">❌⭕</div>
+                <div class="game-title">Tic-Tac-Toe</div>
+                <div class="game-description">
+                    Challenge a friend in this classic game of Tic-Tac-Toe. First to align three symbols wins!
+                </div>
+                <a href="TicTacToe.html" class="play-button">Play Now</a>
+            </div>
+
+            <div class="game-card" onclick="location.href='RockPaperScissors.html'">
+                <div class="game-thumbnail">🪨📄✂️</div>
+                <div class="game-title">Rock-Paper-Scissors</div>
+                <div class="game-description">
+                    The ultimate showdown! Choose your weapon and outsmart your opponent in this timeless game.
+                </div>
+                <a href="RockPaperScissors.html" class="play-button">Play Now</a>
+            </div>
+        </div>
+
+        <!-- Bio/About Section -->
+        <div class="bio" id="bio">
+            <h2>About K-Games Studios</h2>
+            <p>
+                Founded in 2024 by Nytro101, K-Games Studios is a passionate team dedicated to creating engaging and
+                entertaining games for players of all ages. Our mission is to deliver high-quality gaming experiences
+                with stunning visuals, intuitive gameplay, and innovative features. From casual clickers to strategic
+                challenges, we strive to make gaming fun and accessible for everyone. Join us on our journey to explore
+                new horizons in the gaming world!
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer" id="contact">
+        <p>&copy; 2024 K-Games Studios. All rights reserved.</p>
+    </div>
+
+    <!-- JavaScript for Hamburger Menu and Play Button Fix -->
+    <script>
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Prevent Play Button Click from Triggering Card Click
+        const playButtons = document.querySelectorAll('.play-button');
+        playButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+    </script>
+
 </body>
+
 </html>
