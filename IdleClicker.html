@@ -198,6 +198,23 @@
             position: relative;
         }
 
+        .performance-mode-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: none;
+            /* Start hidden by default */
+            z-index: 9999;
+        }
+
         .resource-label {
             font-size: 0.9rem;
             font-weight: 500;
@@ -1585,6 +1602,11 @@
                         <i class="fas fa-trash-restore"></i>
                         <span>Reset Game</span>
                     </button>
+
+                    <button id="performance-mode-button" class="settings-button">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Enable Performance Mode</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1614,7 +1636,7 @@
                                 <i class="fas fa-paint-roller"></i>Complete UI/UX overhaul with glassmorphism
                             </div>
                             <div class="update-log-item">
-                                <i class="fas fa-rocket"></i>Hardware acceleration & performance optimizations
+                                <i class="fas fa-rocket"></i>Hardware acceleration & NEW performance mode
                             </div>
                             <div class="update-log-item">
                                 <i class="fas fa-layer-group"></i>150+ new upgrades with evolution system
@@ -1716,30 +1738,36 @@
         </div>
     </div>
 
+    <div class="performance-mode-indicator" id="performance-indicator">
+        ⚡ Performance Mode Active
+    </div>
+
     <div class="notification-container" id="notification-container"></div>
 
     <script>
 
         document.getElementById('click-button').addEventListener('click', function () {
-            // Create particle burst effect
-            const particles = 8;
-            for (let i = 0; i < particles; i++) {
-                const particle = document.createElement('div');
-                particle.style.cssText = `
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            pointer-events: none;
-            animation: particle-burst 0.8s ease-out;
-            --tx: ${Math.random() * 100 - 50}px;
-            --ty: ${Math.random() * 100 - 50}px;
-        `;
-                this.appendChild(particle);
-                setTimeout(() => particle.remove(), 800);
-            }
 
+            if (!gameState.performanceMode) {
+                // Create particle burst effect
+                const particles = 8;
+                for (let i = 0; i < particles; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.cssText = `
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                background: linear-gradient(45deg, var(--primary), var(--secondary));
+                border-radius: 50%;
+                pointer-events: none;
+                animation: particle-burst 0.8s ease-out;
+                --tx: ${Math.random() * 100 - 50}px;
+                --ty: ${Math.random() * 100 - 50}px;
+            `;
+                    this.appendChild(particle);
+                    setTimeout(() => particle.remove(), 800);
+                }
+            }
             // Add temporary scale effect
             this.style.transform = 'scale(0.95)';
             setTimeout(() => {
@@ -1754,7 +1782,8 @@
             rebirths: 0,
             upgrades: {},
             upgradeCosts: {},
-            achievements: {}
+            achievements: {},
+            performanceMode: false
         };
 
         // Upgrades Config
@@ -2212,6 +2241,11 @@
         function updateUI() {
             const coinElement = document.getElementById('coin-count');
             const expElement = document.getElementById('exp-count');
+            document.getElementById('rebirth-counter').textContent = `Rebirths: ${gameState.rebirths}`;
+
+            const perfIndicator = document.getElementById('performance-indicator');
+            perfIndicator.style.display = gameState.performanceMode ? 'block' : 'none';
+
             updateProgressBar();
             // Animate coin value changes
             if (coinElement.textContent !== formatNumber(gameState.coins)) {
@@ -2238,6 +2272,7 @@
         }
 
         function createCoinParticles() {
+            if (gameState.performanceMode) return;
             const coinCard = document.getElementById('coin-card');
             for (let i = 0; i < 5; i++) {
                 const particle = document.createElement('div');
@@ -2425,6 +2460,10 @@
             const saved = localStorage.getItem('neonClickerSave');
             if (saved) {
                 gameState = JSON.parse(saved);
+                // Initialize performanceMode if not present in old saves
+                if (typeof gameState.performanceMode === 'undefined') {
+                    gameState.performanceMode = false;
+                }
             }
         }
 
@@ -2435,6 +2474,15 @@
                 gameState.coins += val;
                 gameState.exp += val * 0.2;
                 updateUI();
+            });
+
+            document.getElementById('performance-mode-button').addEventListener('click', () => {
+                gameState.performanceMode = !gameState.performanceMode;
+                const btn = document.getElementById('performance-mode-button');
+                btn.querySelector('span').textContent =
+                    gameState.performanceMode ? 'Disable Performance Mode' : 'Enable Performance Mode';
+                showNotification('success', `Performance Mode ${gameState.performanceMode ? 'Enabled' : 'Disabled'}`);
+                saveGame();
             });
 
             document.getElementById('updates-button').addEventListener('click', () => {
