@@ -374,7 +374,8 @@
 
         /* ACHIEVEMENTS POPUP */
         .achievement-popup {
-            position: fixed;
+            position: absolute;
+            /* instead of fixed */
             bottom: 20px;
             right: 20px;
             background: var(--glass);
@@ -387,7 +388,6 @@
             transition: all 0.4s ease;
             z-index: 2000;
             pointer-events: none;
-            /* won't block clicks */
         }
 
         .achievement-popup.show {
@@ -662,7 +662,7 @@
                 id: 'mega-click',
                 name: 'Mega Click',
                 baseCost: 2500,
-                multiplier: 2
+                multiplier: 2.5
             },
             // Example: hidden until auto-click >= 10
             {
@@ -676,7 +676,7 @@
                 id: 'time-machine',
                 name: 'Time Machine',
                 baseCost: 10000,
-                income: 10
+                income: 3.5
             },
             // Example: hidden until quantum >= 10
             {
@@ -684,26 +684,27 @@
                 name: 'Hyperdrive',
                 baseCost: 250000,
                 income: 50,
-                multiplier: 1.5,
+                multiplier: 4,
                 unlockCondition: { requiredId: 'quantum', requiredLevel: 10 }
             },
             {
                 id: 'parallel-universe',
                 name: 'Parallel Universe',
                 baseCost: 1e6,
-                multiplier: 4
+                multiplier: 4.5
             },
             {
                 id: 'chrono-loop',
                 name: 'Chrono Loop',
                 baseCost: 5e6,
-                income: 250
+                income: 250,
+                multiplier: 5
             },
             {
                 id: 'stellar-forge',
                 name: 'Stellar Forge',
                 baseCost: 1e7,
-                multiplier: 5
+                multiplier: 5.5
             },
             // Example: hidden until quantum >= 25
             {
@@ -711,86 +712,86 @@
                 name: 'Dark Matter',
                 baseCost: 5e7,
                 income: 1000,
-                multiplier: 2,
+                multiplier: 6.5,
                 unlockCondition: { requiredId: 'quantum', requiredLevel: 25 }
             },
             {
                 id: 'nanobots',
                 name: 'Nanobots',
                 baseCost: 1e8,
-                multiplier: 6
+                multiplier: 7
             },
             {
                 id: 'wormhole',
                 name: 'Wormhole',
                 baseCost: 5e8,
                 income: 5000,
-                multiplier: 3
+                multiplier: 7.5
             },
             {
                 id: 'antimatter',
                 name: 'Antimatter',
                 baseCost: 1e9,
-                multiplier: 7
+                multiplier: 8
             },
             {
                 id: 'infinity-core',
                 name: 'Infinity Core',
                 baseCost: 5e9,
                 income: 20000,
-                multiplier: 3
+                multiplier: 8.5
             },
             {
                 id: 'galactic-press',
                 name: 'Galactic Press',
                 baseCost: 1e10,
-                multiplier: 8
+                multiplier: 9
             },
             {
                 id: 'multi-verse',
                 name: 'Multi-Verse',
                 baseCost: 5e10,
                 income: 100000,
-                multiplier: 4
+                multiplier: 9.5
             },
             {
                 id: 'dimensional-rift',
                 name: 'Dimensional Rift',
                 baseCost: 1e11,
-                multiplier: 9
+                multiplier: 10
             },
             {
                 id: 'cosmic-ray',
                 name: 'Cosmic Ray',
                 baseCost: 5e11,
                 income: 500000,
-                multiplier: 5
+                multiplier: 15
             },
             {
                 id: 'eternal-flux',
                 name: 'Eternal Flux',
                 baseCost: 1e12,
-                multiplier: 10
+                multiplier: 20
             },
             {
                 id: 'nebula-smelter',
                 name: 'Nebula Smelter',
                 baseCost: 5e12,
                 income: 2e6,
-                multiplier: 4
+                multiplier: 25
             },
             {
                 id: 'chrono-synth',
                 name: 'Chrono Synth',
                 baseCost: 1e13,
-                multiplier: 12
+                multiplier: 35
             },
             {
                 id: 'void-extractor',
                 name: 'Void Extractor',
                 baseCost: 5e13,
                 income: 1e7,
-                multiplier: 5
+                multiplier: 50
             }
         ];
 
