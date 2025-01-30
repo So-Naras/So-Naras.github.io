@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Neon Glass Clicker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --secondary: #ff6b6b;
+            --glass: rgba(255, 255, 255, 0.1);
+            --text: rgba(255, 255, 255, 0.9);
+            --container-bg: linear-gradient(45deg, #1a1a2e, #16213e);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--container-bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .game-container {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            width: 95%;
+            max-width: 1200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .right-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            position: relative;
+            z-index: 10;
+            /* Ensure these buttons stay above any overlays */
+        }
+
+        .control-button {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* REBIRTH COUNTER */
+        .rebirth-counter {
+            background: var(--glass);
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .rebirth-counter:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* RESOURCES */
+        .resource-display {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            background: var(--glass);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+        }
+
+        /* CLICK BUTTON */
+        .click-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .click-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .click-button i {
+            font-size: 3rem;
+            pointer-events: none;
+        }
+
+        .click-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 32px rgba(124, 58, 237, 0.4);
+        }
+
+        .click-button:active {
+            transform: scale(0.95);
+        }
+
+        /* EXPERIENCE / LEVEL BAR */
+        .level-display {
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .progress-container {
+            width: 80%;
+            margin: 0 auto;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            line-height: 24px;
+            color: #fff;
+            pointer-events: none;
+        }
+
+        /* UPGRADES */
+        .upgrades-section {
+            margin-top: 3rem;
+        }
+
+        .upgrades-title {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            font-weight: 600;
+        }
+
+        .upgrades {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .upgrade-card {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upgrade-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .upgrade-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .upgrade-name-level {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .upgrade-name-level h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            flex: 1;
+        }
+
+        .upgrade-level-badge {
+            background: var(--secondary);
+            color: #fff;
+            border-radius: 12px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .upgrade-cost {
+            margin-bottom: 0.5rem;
+        }
+
+        .upgrade-buy-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .upgrade-buy-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .upgrade-buy-button i {
+            font-size: 1.2rem;
+        }
+
+        /* MODALS */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modalEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalEnter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ACHIEVEMENTS POPUP */
+        .achievement-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--glass);
+            backdrop-filter: blur(8px);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 2000;
+            pointer-events: none;
+            /* won't block clicks */
+        }
+
+        .achievement-popup.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .popup-title {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        /* ACHIEVEMENTS LIST (MODAL) */
+        .achievements-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .achievement-card {
+            display: flex;
+            flex-direction: column;
+            /* vertical layout to accommodate progress bar */
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 1rem;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .achievement-top-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: var(--secondary);
+            transition: filter 0.3s, opacity 0.3s;
+        }
+
+        .achievement-content {
+            flex: 1;
+        }
+
+        .achievement-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .achievement-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .achievement-status {
+            font-size: 1.4rem;
+            margin-left: auto;
+            margin-right: 0.2rem;
+        }
+
+        /* Small progress bar under achievement content */
+        .achievement-progress-container {
+            margin-top: 0.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .achievement-progress-fill {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            height: 100%;
+            width: 0%;
+            /* updated in JS */
+            transition: width 0.4s;
+        }
+
+        .achievement-progress-text {
+            text-align: right;
+            font-size: 0.7rem;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        /* Completed vs locked states */
+        .achievement-card.locked .achievement-icon {
+            filter: grayscale(100%);
+            opacity: 0.4;
+        }
+
+        .achievement-card.locked .achievement-status {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .achievement-card.completed {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .achievement-card.completed .achievement-status {
+            color: limegreen;
+        }
+
+        /* PARTICLE ANIMATION */
+        @keyframes particle {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1 class="title">Neon Clicker</h1>
+            <div class="right-header">
+                <div id="rebirth-counter" class="rebirth-counter">Rebirths: 0</div>
+                <div class="controls">
+                    <div class="control-button" id="rebirth-button">
+                        <i class="fas fa-redo-alt"></i>
+                    </div>
+                    <div class="control-button" id="achievements-button">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="control-button" id="settings-button">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEVEL/EXP BAR -->
+        <div class="level-display">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+                <div class="progress-text" id="progress-text">Level 1 - 0%</div>
+            </div>
+        </div>
+
+        <!-- RESOURCES -->
+        <div class="resource-display">
+            <div>
+                <i class="fas fa-coins"></i> <span id="coin-count">0</span>
+            </div>
+            <div>
+                <i class="fas fa-star"></i> <span id="exp-count">0</span>
+            </div>
+        </div>
+
+        <!-- CLICK BUTTON -->
+        <div class="click-section">
+            <button class="click-button" id="click-button">
+                <i class="fas fa-hand-pointer"></i>
+            </button>
+        </div>
+
+        <!-- UPGRADES -->
+        <div class="upgrades-section">
+            <h2 class="upgrades-title">Upgrades</h2>
+            <div class="upgrades" id="upgrades-container"></div>
+        </div>
+
+        <!-- SETTINGS MODAL -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <h2>Settings</h2>
+                <button id="reset-game-button" class="upgrade-buy-button">
+                    <i class="fas fa-undo"></i> Reset Game
+                </button>
+            </div>
+        </div>
+
+        <!-- ACHIEVEMENTS MODAL -->
+        <div id="achievements-modal" class="modal">
+            <div class="modal-content">
+                <h2>Achievements</h2>
+                <div id="achievements-list" class="achievements-list"></div>
+            </div>
+        </div>
+
+        <!-- REBIRTH MODAL -->
+        <div id="rebirth-modal" class="modal">
+            <div class="modal-content">
+                <h2>Rebirth</h2>
+                <button id="rebirth-confirm-button" class="upgrade-buy-button">
+                    <i class="fas fa-redo-alt"></i> Rebirth
+                </button>
+            </div>
+        </div>
+
+        <!-- ACHIEVEMENT POPUP -->
+        <div id="achievement-popup" class="achievement-popup">
+            <div class="popup-title">Achievement Unlocked!</div>
+            <div class="popup-description"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            coins: 0,
+            exp: 0,
+            level: 1,
+            rebirths: 0,
+            upgrades: {},
+            achievements: {}
+        };
+
+        // Upgrades Config
+        const upgradesConfig = [
+            { id: 'auto-click', name: 'Auto Click', cost: 50, income: 1 },
+            { id: 'click-mult', name: 'Click Multiplier', cost: 100, multiplier: 1.5 },
+            { id: 'quantum', name: 'Quantum Boost', cost: 500, income: 5, multiplier: 2 }
+        ];
+
+        // Achievements Config (Partial Progress Example)
+        const achievementsConfig = [
+            {
+                id: 'first-click',
+                name: 'First Click',
+                description: 'Reach 10 coins.',
+                icon: 'fa-hand-point-up',
+                // condition => fully complete once coins >= 10
+                condition: (state) => state.coins >= 10,
+                // partial progress tracking
+                progressKey: 'coins',
+                goal: 10
+            },
+            {
+                id: 'coin-collector',
+                name: 'Coin Collector',
+                description: 'Collect 10,000 coins.',
+                icon: 'fa-coins',
+                condition: (state) => state.coins >= 10000,
+                progressKey: 'coins',
+                goal: 10000
+            },
+            {
+                id: 'millionaire',
+                name: 'Millionaire',
+                description: 'Reach 1,000,000 coins.',
+                icon: 'fa-gem',
+                condition: (state) => state.coins >= 1e6,
+                progressKey: 'coins',
+                goal: 1e6
+            }
+            // Add more achievements if you wish...
+        ];
+
+        // Initialization
+        function init() {
+            loadGame();
+            renderUpgrades();
+            renderAchievements();
+            startGameLoop();
+            setupEventListeners();
+            updateUI();
+        }
+
+        // Game Loop
+        function startGameLoop() {
+            setInterval(() => {
+                gameState.coins += getAutoIncome();
+                gameState.exp += getAutoIncome() * 0.1;
+                updateUI();
+                checkAchievements();
+                checkLevelUp();
+                saveGame();
+            }, 1000);
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('coin-count').textContent = formatNumber(gameState.coins);
+            document.getElementById('exp-count').textContent = formatNumber(gameState.exp);
+            document.getElementById('rebirth-counter').textContent = `Rebirths: ${gameState.rebirths}`;
+            updateProgressBar();
+            updateUpgradesUI();
+        }
+
+        function updateUpgradesUI() {
+            // Update each upgrade card to show current cost and level
+            upgradesConfig.forEach((upgrade) => {
+                const level = gameState.upgrades[upgrade.id] || 0;
+                const upgradeCard = document.querySelector(`[data-id="${upgrade.id}"]`);
+                if (!upgradeCard) return;
+                upgradeCard.querySelector('.upgrade-level-badge').textContent = 'Lvl ' + level;
+                upgradeCard.querySelector('.upgrade-cost').textContent = `Cost: ${formatNumber(upgrade.cost)}`;
+            });
+        }
+
+        // Format Numbers
+        function formatNumber(num) {
+            const suffixes = ['', 'K', 'M', 'B', 'T'];
+            let suffixIndex = 0;
+            while (num >= 1000 && suffixIndex < suffixes.length - 1) {
+                num /= 1000;
+                suffixIndex++;
+            }
+            return `${num.toFixed(2)}${suffixes[suffixIndex]}`;
+        }
+
+        // Render Upgrades
+        function renderUpgrades() {
+            const container = document.getElementById('upgrades-container');
+            container.innerHTML = upgradesConfig
+                .map((upgrade) => {
+                    const level = gameState.upgrades[upgrade.id] || 0;
+                    return `
+            <div class="upgrade-card" data-id="${upgrade.id}">
+              <i class="fas fa-rocket upgrade-icon"></i>
+              <div class="upgrade-name-level">
+                <h3>${upgrade.name}</h3>
+                <div class="upgrade-level-badge">Lvl ${level}</div>
+              </div>
+              <p class="upgrade-cost">Cost: ${formatNumber(upgrade.cost)}</p>
+              <button class="upgrade-buy-button" onclick="buyUpgrade('${upgrade.id}')">
+                <i class="fas fa-cart-plus"></i> Buy
+              </button>
+            </div>
+          `;
+                })
+                .join('');
+        }
+
+        function buyUpgrade(id) {
+            const upgrade = upgradesConfig.find((u) => u.id === id);
+            if (!upgrade) return;
+
+            if (gameState.coins >= upgrade.cost) {
+                gameState.coins -= upgrade.cost;
+                gameState.upgrades[id] = (gameState.upgrades[id] || 0) + 1;
+                // Increase cost for next purchase
+                upgrade.cost = Math.ceil(upgrade.cost * 1.8);
+                animatePurchase(id);
+                updateUI();
+            }
+        }
+
+        // Render Achievements
+        // Includes partial progress bar or text if progressKey/goal exist
+        function renderAchievements() {
+            const container = document.getElementById('achievements-list');
+            container.innerHTML = achievementsConfig
+                .map((ach) => {
+                    const isCompleted = !!gameState.achievements[ach.id]; // completed?
+                    const statusIcon = isCompleted ? 'fa-check-circle' : 'fa-lock';
+                    // If no custom icon is provided, fallback to fa-trophy
+                    const achievementIcon = ach.icon || 'fa-trophy';
+
+                    // Calculate partial progress if applicable
+                    let progressBarHTML = '';
+                    if (ach.progressKey && ach.goal) {
+                        const current = gameState[ach.progressKey] || 0;
+                        const clamped = Math.min(current, ach.goal);
+                        const percent = (clamped / ach.goal) * 100;
+                        progressBarHTML = `
+              <div class="achievement-progress-container">
+                <div class="achievement-progress-fill" style="width: ${percent}%;"></div>
+              </div>
+              <div class="achievement-progress-text">
+                ${formatNumber(clamped)} / ${formatNumber(ach.goal)}
+              </div>
+            `;
+                    }
+
+                    return `
+            <div 
+              class="achievement-card ${isCompleted ? 'completed' : 'locked'}" 
+              data-id="${ach.id}"
+            >
+              <div class="achievement-top-row">
+                <i class="achievement-icon fas ${achievementIcon}"></i>
+                <div class="achievement-content">
+                  <h4 class="achievement-title">${ach.name}</h4>
+                  <p class="achievement-description">${ach.description || ''}</p>
+                </div>
+                <div class="achievement-status">
+                  <i class="fas ${statusIcon}"></i>
+                </div>
+              </div>
+              ${progressBarHTML}
+            </div>
+          `;
+                })
+                .join('');
+        }
+
+        // Check & Unlock Achievements
+        function checkAchievements() {
+            achievementsConfig.forEach((ach) => {
+                if (!gameState.achievements[ach.id] && ach.condition(gameState)) {
+                    // Mark achievement as complete
+                    gameState.achievements[ach.id] = true;
+                    showAchievementPopup(ach);
+                }
+            });
+            // Re-render achievements to update UI (grayscale -> color, lock -> check)
+            renderAchievements();
+        }
+
+        function showAchievementPopup(achievement) {
+            const popup = document.getElementById('achievement-popup');
+            popup.querySelector('.popup-description').textContent = achievement.name;
+            popup.classList.add('show');
+            setTimeout(() => popup.classList.remove('show'), 3000);
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // Leveling & Progress Bar
+        function checkLevelUp() {
+            // Example check: 100 EXP * current level to level up
+            if (gameState.exp >= gameState.level * 100) {
+                gameState.exp -= gameState.level * 100;
+                gameState.level++;
+            }
+        }
+
+        function updateProgressBar() {
+            const expNeeded = gameState.level * 100;
+            const currentExp = gameState.exp % expNeeded;
+            const progress = (currentExp / expNeeded) * 100;
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `Level ${gameState.level} - ${Math.floor(progress)}%`;
+        }
+
+        // Click Button
+        function getClickValue() {
+            return 1 * Math.pow(1.5, gameState.upgrades['click-mult'] || 0);
+        }
+
+        function getAutoIncome() {
+            return (gameState.upgrades['auto-click'] || 0) * 1;
+        }
+
+        // Animations
+        function animatePurchase(id) {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            if (!card) return;
+            card.animate(
+                [
+                    { transform: 'scale(1)' },
+                    { transform: 'scale(1.1)' },
+                    { transform: 'scale(1)' }
+                ],
+                { duration: 300 }
+            );
+        }
+
+        function createClickParticles() {
+            // Particle animation logic (optional)
+        }
+
+        // Save/Load
+        function saveGame() {
+            localStorage.setItem('neonClickerSave', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const save = localStorage.getItem('neonClickerSave');
+            if (save) {
+                gameState = JSON.parse(save);
+            }
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Click
+            document.getElementById('click-button').addEventListener('click', () => {
+                gameState.coins += getClickValue();
+                gameState.exp += getClickValue() * 0.2;
+                updateUI();
+                createClickParticles();
+            });
+
+            // Modal toggles
+            ['settings', 'achievements', 'rebirth'].forEach((type) => {
+                document.getElementById(`${type}-button`).addEventListener('click', () => {
+                    document.getElementById(`${type}-modal`).style.display = 'flex';
+                });
+                document.getElementById(`${type}-modal`).addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        e.currentTarget.style.display = 'none';
+                    }
+                });
+            });
+
+            // Rebirth confirm button inside modal
+            document
+                .getElementById('rebirth-confirm-button')
+                .addEventListener('click', doRebirth);
+
+            // Reset game
+            document
+                .getElementById('reset-game-button')
+                .addEventListener('click', resetGame);
+        }
+
+        function doRebirth() {
+            // Simple example: require level 10 to rebirth
+            if (gameState.level >= 10) {
+                gameState.rebirths++;
+                // Reset progress
+                gameState.coins = 0;
+                gameState.exp = 0;
+                gameState.level = 1;
+                gameState.upgrades = {};
+            }
+            document.getElementById('rebirth-modal').style.display = 'none';
+            updateUI();
+        }
+
+        function resetGame() {
+            localStorage.removeItem('neonClickerSave');
+            location.reload();
+        }
+
+        // Initialize
+        init();
+    </script>
+</body>
+
+</html>
