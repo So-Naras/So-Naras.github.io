@@ -1113,105 +1113,218 @@
         }
 
         /* ACHIEVEMENTS POPUP: Now absolute, placed inside .game-container */
-        #achievement-popup {
-            position: absolute;
-            right: calc(50% + 180px);
-            /* Positions to left of click button */
-            bottom: 35%;
-            background: linear-gradient(145deg,
-                    rgba(124, 58, 237, 0.2) 0%,
-                    rgba(255, 107, 107, 0.15) 100%);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
+        #achievements-modal .modal-content {
+            background: linear-gradient(45deg,
+                    rgba(124, 58, 237, 0.15) 0%,
+                    rgba(255, 107, 107, 0.1) 100%);
+            backdrop-filter: blur(24px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.2);
+        }
+
+        /* Achievements Header */
+        .achievements-header {
+            text-align: center;
             padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            max-width: 280px;
-            opacity: 0;
-            transform: translateX(-20px) scale(0.95);
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 2000;
-            pointer-events: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
         }
 
-        #achievement-popup.show {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-        }
-
-        .popup-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #fff, #e0e0e0);
+        .achievements-title {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+            position: relative;
+            display: inline-block;
         }
 
-        .popup-description {
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.9);
-            line-height: 1.4;
+        .achievements-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    var(--primary) 50%,
+                    transparent 100%);
         }
 
-        /* Animated border effect */
-        #achievement-popup::before {
+        /* Achievements Grid */
+        .achievements-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        /* Achievement Card Enhancements */
+        .achievement-card {
+            background: linear-gradient(145deg,
+                    rgba(255, 255, 255, 0.08) 0%,
+                    rgba(255, 255, 255, 0.03) 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-card::before {
             content: '';
             position: absolute;
             inset: 0;
-            border-radius: 16px;
-            padding: 2px;
             background: linear-gradient(45deg,
-                    var(--primary) 0%,
-                    var(--secondary) 50%,
-                    var(--primary) 100%);
-            -webkit-mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            animation: borderFlow 3s linear infinite;
+                    rgba(124, 58, 237, 0.1) 0%,
+                    rgba(255, 107, 107, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        @keyframes borderFlow {
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .achievement-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Status Indicators */
+        .achievement-status i {
+            font-size: 1.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .achievement-card.completed .achievement-status i {
+            color: #00ff88;
+            filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.3));
+        }
+
+        .achievement-card.completed {
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .achievement-card.locked {
+            opacity: 0.6;
+            filter: grayscale(0.8);
+        }
+
+        /* Progress Bar Enhancements */
+        .achievement-progress-container {
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            margin-top: 1rem;
+        }
+
+        .achievement-progress-fill {
+            background: linear-gradient(90deg,
+                    var(--primary) 0%,
+                    var(--secondary) 100%);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.2) 50%,
+                    transparent 100%);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
             0% {
-                background-position: 0 0;
+                left: -100%;
             }
 
             100% {
-                background-position: 200% 0;
+                left: 200%;
             }
         }
 
-        /* Progress indicator */
-        .achievement-progress {
-            height: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin-top: 1rem;
-            overflow: hidden;
-            position: relative;
+        /* Icon Enhancements */
+        .achievement-icon {
+            font-size: 2.2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(124, 58, 237, 0.3));
         }
 
-        .achievement-progress::after {
-            content: '';
+        .achievement-card.completed .achievement-icon {
+            animation: iconPulse 2s infinite;
+        }
+
+        @keyframes iconPulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Category Badges */
+        .achievement-category {
             position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 3s linear;
+            top: -1px;
+            right: -1px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 0 20px 0 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        #achievement-popup.show .achievement-progress::after {
-            transform: scaleX(1);
+        /* Achievement Counter */
+        .achievements-counter {
+            text-align: center;
+            margin: 1.5rem 0 2rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .achievements-counter span {
+            color: var(--secondary);
+            font-weight: 700;
+            margin: 0 0.3rem;
+        }
+
+        /* Achievements Header Adjustments */
+        .achievements-header {
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .achievements-title::after {
+            bottom: -15px;
         }
 
         .update-log-list {
@@ -1636,7 +1749,7 @@
                                 <i class="fas fa-paint-roller"></i>Complete UI/UX overhaul with glassmorphism
                             </div>
                             <div class="update-log-item">
-                                <i class="fas fa-rocket"></i>Hardware acceleration & NEW performance mode
+                                <i class="fas fa-rocket"></i>Hardware acceleration & performance optimizations
                             </div>
                             <div class="update-log-item">
                                 <i class="fas fa-layer-group"></i>150+ new upgrades with evolution system
@@ -1707,7 +1820,12 @@
         <!-- ACHIEVEMENTS MODAL -->
         <div id="achievements-modal" class="modal" style="display: none;">
             <div class="modal-content">
-                <h2>Achievements</h2>
+                <div class="achievements-header">
+                    <h2 class="achievements-title">Achievements</h2>
+                    <div class="achievements-counter">
+                        Unlocked: <span id="unlocked-count">0</span> / <span id="total-achievements">0</span>
+                    </div>
+                </div>
                 <div id="achievements-list" class="achievements-list"></div>
             </div>
         </div>
@@ -2311,6 +2429,12 @@
 
         function renderAchievements() {
             const container = document.getElementById('achievements-list');
+            const total = achievementsConfig.length;
+            const unlocked = Object.values(gameState.achievements).filter(Boolean).length;
+
+            document.getElementById('unlocked-count').textContent = unlocked;
+            document.getElementById('total-achievements').textContent = total;
+
             container.innerHTML = achievementsConfig
                 .map(ach => {
                     const done = !!gameState.achievements[ach.id];
@@ -2331,22 +2455,21 @@
                         </div>
                     `;
                     }
-
                     return `
-                <div class="achievement-card ${done ? 'completed' : 'locked'}" data-id="${ach.id}">
-                    <div class="achievement-top-row">
-                        <i class="achievement-icon fas ${achIcon}"></i>
-                        <div class="achievement-content">
-                            <h4 class="achievement-title">${ach.name}</h4>
-                            <p class="achievement-description">${ach.description || ''}</p>
-                        </div>
-                        <div class="achievement-status">
-                            <i class="fas ${icon}"></i>
-                        </div>
+            <div class="achievement-card ${done ? 'completed' : 'locked'}" data-id="${ach.id}">
+                <div class="achievement-category">${ach.category || 'General'}</div>
+                <div class="achievement-top-row">
+                    <i class="achievement-icon fas ${achIcon}"></i>
+                    <div class="achievement-content">
+                        <h4 class="achievement-title">${ach.name}</h4>
+                        <p class="achievement-description">${ach.description || ''}</p>
                     </div>
-                    ${progressBar}
+                    <div class="achievement-status">
+                        <i class="fas ${icon}"></i>
+                    </div>
                 </div>
-                `;
+                ${progressBar}
+            </div>`;
                 })
                 .join('');
         }
