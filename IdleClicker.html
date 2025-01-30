@@ -6,7 +6,8 @@
     <title>Neon Glass Clicker</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js">
+    </script>
     <style>
         :root {
             --primary: #7c3aed;
@@ -22,6 +23,7 @@
             padding: 0;
         }
 
+        /* Allow body to scroll if needed */
         body {
             background: var(--container-bg);
             color: var(--text);
@@ -30,7 +32,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
         }
 
         .game-container {
@@ -43,7 +44,6 @@
             width: 95%;
             max-width: 1200px;
             position: relative;
-            overflow: hidden;
         }
 
         /* HEADER */
@@ -75,7 +75,6 @@
             gap: 1rem;
             position: relative;
             z-index: 10;
-            /* Ensure these buttons stay above any overlays */
         }
 
         .control-button {
@@ -294,12 +293,13 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
+            width: 100vw;
+            height: 100vh;
+            /* Center content vertically/horizontally */
+            display: flex;
             justify-content: center;
             align-items: center;
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1000;
         }
 
@@ -312,6 +312,18 @@
             max-width: 600px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             animation: modalEnter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Scroll, but hide the scrollbar */
+            max-height: 80vh;
+            overflow-y: auto;
+            scrollbar-width: none;
+            /* for Firefox */
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+            /* Chrome/Safari/Opera */
         }
 
         @keyframes modalEnter {
@@ -324,6 +336,40 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .settings-grid {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .settings-button {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .settings-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
         }
 
         /* ACHIEVEMENTS POPUP */
@@ -354,7 +400,6 @@
             margin-bottom: 0.2rem;
         }
 
-        /* ACHIEVEMENTS LIST (MODAL) */
         .achievements-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -365,7 +410,6 @@
         .achievement-card {
             display: flex;
             flex-direction: column;
-            /* vertical layout to accommodate progress bar */
             background: var(--glass);
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(8px);
@@ -415,7 +459,6 @@
             margin-right: 0.2rem;
         }
 
-        /* Small progress bar under achievement content */
         .achievement-progress-container {
             margin-top: 0.5rem;
             background: rgba(255, 255, 255, 0.15);
@@ -429,7 +472,6 @@
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             height: 100%;
             width: 0%;
-            /* updated in JS */
             transition: width 0.4s;
         }
 
@@ -440,7 +482,6 @@
             opacity: 0.7;
         }
 
-        /* Completed vs locked states */
         .achievement-card.locked .achievement-icon {
             filter: grayscale(100%);
             opacity: 0.4;
@@ -458,7 +499,21 @@
             color: limegreen;
         }
 
-        /* PARTICLE ANIMATION */
+        /* REBIRTH MODAL */
+        .rebirth-info {
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .rebirth-info span {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
         @keyframes particle {
             0% {
                 transform: translate(0, 0) scale(1);
@@ -526,17 +581,22 @@
         </div>
 
         <!-- SETTINGS MODAL -->
-        <div id="settings-modal" class="modal">
-            <div class="modal-content">
+        <div id="settings-modal" class="modal" style="display: none;">
+            <div class="modal-content settings-content">
                 <h2>Settings</h2>
-                <button id="reset-game-button" class="upgrade-buy-button">
-                    <i class="fas fa-undo"></i> Reset Game
-                </button>
+                <div class="settings-grid">
+                    <button id="save-game-button" class="settings-button">
+                        <i class="fas fa-save"></i> Save Game
+                    </button>
+                    <button id="reset-game-button" class="settings-button">
+                        <i class="fas fa-undo"></i> Reset Game
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- ACHIEVEMENTS MODAL -->
-        <div id="achievements-modal" class="modal">
+        <div id="achievements-modal" class="modal" style="display: none;">
             <div class="modal-content">
                 <h2>Achievements</h2>
                 <div id="achievements-list" class="achievements-list"></div>
@@ -544,9 +604,10 @@
         </div>
 
         <!-- REBIRTH MODAL -->
-        <div id="rebirth-modal" class="modal">
+        <div id="rebirth-modal" class="modal" style="display: none;">
             <div class="modal-content">
                 <h2>Rebirth</h2>
+                <div class="rebirth-info" id="rebirth-info"></div>
                 <button id="rebirth-confirm-button" class="upgrade-buy-button">
                     <i class="fas fa-redo-alt"></i> Rebirth
                 </button>
@@ -568,34 +629,187 @@
             level: 1,
             rebirths: 0,
             upgrades: {},
+            upgradeCosts: {},
             achievements: {}
         };
 
         // Upgrades Config
+        // We added unlockCondition for some upgrades to hide them until other upgrades reach certain levels.
         const upgradesConfig = [
-            { id: 'auto-click', name: 'Auto Click', cost: 50, income: 1 },
-            { id: 'click-mult', name: 'Click Multiplier', cost: 100, multiplier: 1.5 },
-            { id: 'quantum', name: 'Quantum Boost', cost: 500, income: 5, multiplier: 2 }
+            // 3 original
+            {
+                id: 'auto-click',
+                name: 'Auto Click',
+                baseCost: 50,
+                income: 1
+            },
+            {
+                id: 'click-mult',
+                name: 'Click Multiplier',
+                baseCost: 100,
+                multiplier: 1.5
+            },
+            {
+                id: 'quantum',
+                name: 'Quantum Boost',
+                baseCost: 500,
+                income: 5,
+                multiplier: 2
+            },
+
+            // 20 more
+            {
+                id: 'mega-click',
+                name: 'Mega Click',
+                baseCost: 2500,
+                multiplier: 2
+            },
+            // Example: hidden until auto-click >= 10
+            {
+                id: 'alien-tech',
+                name: 'Alien Tech',
+                baseCost: 50000,
+                multiplier: 3,
+                unlockCondition: { requiredId: 'auto-click', requiredLevel: 10 }
+            },
+            {
+                id: 'time-machine',
+                name: 'Time Machine',
+                baseCost: 10000,
+                income: 10
+            },
+            // Example: hidden until quantum >= 10
+            {
+                id: 'hyperdrive',
+                name: 'Hyperdrive',
+                baseCost: 250000,
+                income: 50,
+                multiplier: 1.5,
+                unlockCondition: { requiredId: 'quantum', requiredLevel: 10 }
+            },
+            {
+                id: 'parallel-universe',
+                name: 'Parallel Universe',
+                baseCost: 1e6,
+                multiplier: 4
+            },
+            {
+                id: 'chrono-loop',
+                name: 'Chrono Loop',
+                baseCost: 5e6,
+                income: 250
+            },
+            {
+                id: 'stellar-forge',
+                name: 'Stellar Forge',
+                baseCost: 1e7,
+                multiplier: 5
+            },
+            // Example: hidden until quantum >= 25
+            {
+                id: 'dark-matter',
+                name: 'Dark Matter',
+                baseCost: 5e7,
+                income: 1000,
+                multiplier: 2,
+                unlockCondition: { requiredId: 'quantum', requiredLevel: 25 }
+            },
+            {
+                id: 'nanobots',
+                name: 'Nanobots',
+                baseCost: 1e8,
+                multiplier: 6
+            },
+            {
+                id: 'wormhole',
+                name: 'Wormhole',
+                baseCost: 5e8,
+                income: 5000,
+                multiplier: 3
+            },
+            {
+                id: 'antimatter',
+                name: 'Antimatter',
+                baseCost: 1e9,
+                multiplier: 7
+            },
+            {
+                id: 'infinity-core',
+                name: 'Infinity Core',
+                baseCost: 5e9,
+                income: 20000,
+                multiplier: 3
+            },
+            {
+                id: 'galactic-press',
+                name: 'Galactic Press',
+                baseCost: 1e10,
+                multiplier: 8
+            },
+            {
+                id: 'multi-verse',
+                name: 'Multi-Verse',
+                baseCost: 5e10,
+                income: 100000,
+                multiplier: 4
+            },
+            {
+                id: 'dimensional-rift',
+                name: 'Dimensional Rift',
+                baseCost: 1e11,
+                multiplier: 9
+            },
+            {
+                id: 'cosmic-ray',
+                name: 'Cosmic Ray',
+                baseCost: 5e11,
+                income: 500000,
+                multiplier: 5
+            },
+            {
+                id: 'eternal-flux',
+                name: 'Eternal Flux',
+                baseCost: 1e12,
+                multiplier: 10
+            },
+            {
+                id: 'nebula-smelter',
+                name: 'Nebula Smelter',
+                baseCost: 5e12,
+                income: 2e6,
+                multiplier: 4
+            },
+            {
+                id: 'chrono-synth',
+                name: 'Chrono Synth',
+                baseCost: 1e13,
+                multiplier: 12
+            },
+            {
+                id: 'void-extractor',
+                name: 'Void Extractor',
+                baseCost: 5e13,
+                income: 1e7,
+                multiplier: 5
+            }
         ];
 
-        // Achievements Config (Partial Progress Example)
+        // 3 original + 20 new = 23 achievements
         const achievementsConfig = [
             {
                 id: 'first-click',
                 name: 'First Click',
-                description: 'Reach 10 coins.',
-                icon: 'fa-hand-point-up',
-                // condition => fully complete once coins >= 10
+                description: 'Earn 10 coins to get started on your clicking journey.',
+                icon: 'fa-mouse-pointer',
                 condition: (state) => state.coins >= 10,
-                // partial progress tracking
                 progressKey: 'coins',
                 goal: 10
             },
             {
                 id: 'coin-collector',
                 name: 'Coin Collector',
-                description: 'Collect 10,000 coins.',
-                icon: 'fa-coins',
+                description: 'Collect 10,000 coins overall. You’re well on your way!',
+                icon: 'fa-sack-dollar',
                 condition: (state) => state.coins >= 10000,
                 progressKey: 'coins',
                 goal: 10000
@@ -603,165 +817,337 @@
             {
                 id: 'millionaire',
                 name: 'Millionaire',
-                description: 'Reach 1,000,000 coins.',
-                icon: 'fa-gem',
+                description: 'Accumulate 1,000,000 coins and join the millionaires club.',
+                icon: 'fa-money-bill-wave',
                 condition: (state) => state.coins >= 1e6,
                 progressKey: 'coins',
                 goal: 1e6
+            },
+            {
+                id: 'clumsy-clicker',
+                name: 'Clumsy Clicker',
+                description: 'Reach 100 coins. Baby steps for the new clicker.',
+                icon: 'fa-hand-pointer',
+                condition: (state) => state.coins >= 100,
+                progressKey: 'coins',
+                goal: 100
+            },
+            {
+                id: 'established-clicker',
+                name: 'Established Clicker',
+                description: 'Hit 1,000 coins. You’re getting the hang of this!',
+                icon: 'fa-thumbs-up',
+                condition: (state) => state.coins >= 1000,
+                progressKey: 'coins',
+                goal: 1000
+            },
+            {
+                id: 'wealthy',
+                name: 'Wealthy',
+                description: 'Amass 100,000 coins. Now that’s serious dough!',
+                icon: 'fa-hand-holding-dollar',
+                condition: (state) => state.coins >= 1e5,
+                progressKey: 'coins',
+                goal: 1e5
+            },
+            {
+                id: 'super-rich',
+                name: 'Super Rich',
+                description: '10 million coins is no joke—welcome to the big leagues!',
+                icon: 'fa-piggy-bank',
+                condition: (state) => state.coins >= 1e7,
+                progressKey: 'coins',
+                goal: 1e7
+            },
+            {
+                id: 'the-1-percent',
+                name: 'The 1 Percent',
+                description: '100 million coins sets you apart from mere mortals!',
+                icon: 'fa-diamond',
+                condition: (state) => state.coins >= 1e8,
+                progressKey: 'coins',
+                goal: 1e8
+            },
+            {
+                id: 'billionaire',
+                name: 'Billionaire',
+                description: 'Reach 1,000,000,000 coins. A whole new level of wealth!',
+                icon: 'fa-building',
+                condition: (state) => state.coins >= 1e9,
+                progressKey: 'coins',
+                goal: 1e9
+            },
+            {
+                id: 'multi-billionaire',
+                name: 'Multi-Billionaire',
+                description: '10,000,000,000 coins. You can buy entire planets—almost!',
+                icon: 'fa-landmark',
+                condition: (state) => state.coins >= 1e10,
+                progressKey: 'coins',
+                goal: 1e10
+            },
+            {
+                id: 'trillionaire',
+                name: 'Trillionaire',
+                description: 'You’ve reached a trillion coins. That’s a thousand billions!',
+                icon: 'fa-crown',
+                condition: (state) => state.coins >= 1e12,
+                progressKey: 'coins',
+                goal: 1e12
+            },
+            {
+                id: 'the-elite',
+                name: 'The Elite',
+                description: 'At 100 trillion coins, you’re basically unstoppable!',
+                icon: 'fa-chess-king',
+                condition: (state) => state.coins >= 1e14,
+                progressKey: 'coins',
+                goal: 1e14
+            },
+            {
+                id: 'cosmic-mogul',
+                name: 'Cosmic Mogul',
+                description: '10 quadrillion coins. You might as well own the galaxy!',
+                icon: 'fa-earth-americas',
+                condition: (state) => state.coins >= 1e16,
+                progressKey: 'coins',
+                goal: 1e16
+            },
+            {
+                id: 'level-10',
+                name: 'Rookie Adventurer',
+                description: 'Reach level 10. You’ve survived the tutorial!',
+                icon: 'fa-chart-line',
+                condition: (state) => state.level >= 10
+            },
+            {
+                id: 'level-25',
+                name: 'Adept Adventurer',
+                description: 'Reach level 25. The mid-game awaits!',
+                icon: 'fa-medal',
+                condition: (state) => state.level >= 25
+            },
+            {
+                id: 'level-50',
+                name: 'Advanced Adventurer',
+                description: 'Reach level 50. You’re rising through the ranks!',
+                icon: 'fa-dumbbell',
+                condition: (state) => state.level >= 50
+            },
+            {
+                id: 'level-75',
+                name: 'Elite Adventurer',
+                description: 'Reach level 75. Only the best get this far!',
+                icon: 'fa-bolt',
+                condition: (state) => state.level >= 75
+            },
+            {
+                id: 'level-100',
+                name: 'Master Adventurer',
+                description: 'Reach level 100. The game is yours to conquer!',
+                icon: 'fa-shield-halved',
+                condition: (state) => state.level >= 100
+            },
+            {
+                id: 'rebirth-1',
+                name: 'First Rebirth',
+                description: 'Perform your first Rebirth. It’s like starting anew—only stronger!',
+                icon: 'fa-redo-alt',
+                condition: (state) => state.rebirths >= 1
+            },
+            {
+                id: 'rebirth-5',
+                name: 'Five Rebirths',
+                description: 'You’ve restarted life 5 times now. Nothing can hold you back!',
+                icon: 'fa-sync-alt',
+                condition: (state) => state.rebirths >= 5
+            },
+            {
+                id: 'rebirth-10',
+                name: 'Ten Rebirths',
+                description: 'Ten times reborn—ten times the wisdom and power!',
+                icon: 'fa-undo-alt',
+                condition: (state) => state.rebirths >= 10
+            },
+            {
+                id: 'rebirth-25',
+                name: 'Twenty-Five Rebirths',
+                description: '25 rebirths is no accident. You’re a master of repetition!',
+                icon: 'fa-recycle',
+                condition: (state) => state.rebirths >= 25
+            },
+            {
+                id: 'rebirth-50',
+                name: 'Fifty Rebirths',
+                description: '50 rebirths—like a phoenix rising again and again!',
+                icon: 'fa-infinity',
+                condition: (state) => state.rebirths >= 50
             }
-            // Add more achievements if you wish...
         ];
 
-        // Initialization
         function init() {
             loadGame();
+            initUpgradeCosts();
             renderUpgrades();
             renderAchievements();
-            startGameLoop();
             setupEventListeners();
             updateUI();
+            startGameLoop();
         }
 
-        // Game Loop
+        function initUpgradeCosts() {
+            upgradesConfig.forEach((upgrade) => {
+                if (gameState.upgradeCosts[upgrade.id] == null) {
+                    gameState.upgradeCosts[upgrade.id] = upgrade.baseCost;
+                }
+            });
+        }
+
         function startGameLoop() {
             setInterval(() => {
                 gameState.coins += getAutoIncome();
                 gameState.exp += getAutoIncome() * 0.1;
-                updateUI();
-                checkAchievements();
+
                 checkLevelUp();
+                checkAchievements();
+                updateUI();
                 saveGame();
             }, 1000);
         }
 
-        // Update UI
-        function updateUI() {
-            document.getElementById('coin-count').textContent = formatNumber(gameState.coins);
-            document.getElementById('exp-count').textContent = formatNumber(gameState.exp);
-            document.getElementById('rebirth-counter').textContent = `Rebirths: ${gameState.rebirths}`;
-            updateProgressBar();
-            updateUpgradesUI();
-        }
-
-        function updateUpgradesUI() {
-            // Update each upgrade card to show current cost and level
-            upgradesConfig.forEach((upgrade) => {
-                const level = gameState.upgrades[upgrade.id] || 0;
-                const upgradeCard = document.querySelector(`[data-id="${upgrade.id}"]`);
-                if (!upgradeCard) return;
-                upgradeCard.querySelector('.upgrade-level-badge').textContent = 'Lvl ' + level;
-                upgradeCard.querySelector('.upgrade-cost').textContent = `Cost: ${formatNumber(upgrade.cost)}`;
-            });
-        }
-
-        // Format Numbers
-        function formatNumber(num) {
-            const suffixes = ['', 'K', 'M', 'B', 'T'];
-            let suffixIndex = 0;
-            while (num >= 1000 && suffixIndex < suffixes.length - 1) {
-                num /= 1000;
-                suffixIndex++;
-            }
-            return `${num.toFixed(2)}${suffixes[suffixIndex]}`;
-        }
-
-        // Render Upgrades
+        // Render Upgrades, skipping those not yet unlocked
         function renderUpgrades() {
             const container = document.getElementById('upgrades-container');
-            container.innerHTML = upgradesConfig
-                .map((upgrade) => {
-                    const level = gameState.upgrades[upgrade.id] || 0;
-                    return `
-            <div class="upgrade-card" data-id="${upgrade.id}">
-              <i class="fas fa-rocket upgrade-icon"></i>
-              <div class="upgrade-name-level">
-                <h3>${upgrade.name}</h3>
-                <div class="upgrade-level-badge">Lvl ${level}</div>
-              </div>
-              <p class="upgrade-cost">Cost: ${formatNumber(upgrade.cost)}</p>
-              <button class="upgrade-buy-button" onclick="buyUpgrade('${upgrade.id}')">
-                <i class="fas fa-cart-plus"></i> Buy
-              </button>
-            </div>
-          `;
-                })
-                .join('');
+            container.innerHTML = '';
+
+            upgradesConfig.forEach((upgrade) => {
+                // If there's an unlock condition, check it
+                if (upgrade.unlockCondition) {
+                    const { requiredId, requiredLevel } = upgrade.unlockCondition;
+                    const actualLevel = gameState.upgrades[requiredId] || 0;
+                    if (actualLevel < requiredLevel) {
+                        // not unlocked yet, skip rendering
+                        return;
+                    }
+                }
+
+                const level = gameState.upgrades[upgrade.id] || 0;
+                const currentCost = gameState.upgradeCosts[upgrade.id] || upgrade.baseCost;
+                const card = `
+                <div class="upgrade-card" data-id="${upgrade.id}">
+                    <i class="fas fa-rocket upgrade-icon"></i>
+                    <div class="upgrade-name-level">
+                        <h3>${upgrade.name}</h3>
+                        <div class="upgrade-level-badge">Lvl ${level}</div>
+                    </div>
+                    <p class="upgrade-cost">Cost: ${formatNumber(currentCost)}</p>
+                    <button class="upgrade-buy-button" onclick="buyUpgrade('${upgrade.id}')">
+                        <i class="fas fa-cart-plus"></i> Buy
+                    </button>
+                </div>
+            `;
+                container.insertAdjacentHTML('beforeend', card);
+            });
         }
 
         function buyUpgrade(id) {
             const upgrade = upgradesConfig.find((u) => u.id === id);
             if (!upgrade) return;
 
-            if (gameState.coins >= upgrade.cost) {
-                gameState.coins -= upgrade.cost;
+            const currentCost = gameState.upgradeCosts[id];
+            if (gameState.coins >= currentCost) {
+                gameState.coins -= currentCost;
                 gameState.upgrades[id] = (gameState.upgrades[id] || 0) + 1;
-                // Increase cost for next purchase
-                upgrade.cost = Math.ceil(upgrade.cost * 1.8);
+
+                // increase cost
+                gameState.upgradeCosts[id] = Math.ceil(currentCost * 1.8);
+
                 animatePurchase(id);
                 updateUI();
+                // Also re-render so if new upgrades become unlocked, they'll appear
+                renderUpgrades();
             }
         }
 
-        // Render Achievements
-        // Includes partial progress bar or text if progressKey/goal exist
-        function renderAchievements() {
-            const container = document.getElementById('achievements-list');
-            container.innerHTML = achievementsConfig
-                .map((ach) => {
-                    const isCompleted = !!gameState.achievements[ach.id]; // completed?
-                    const statusIcon = isCompleted ? 'fa-check-circle' : 'fa-lock';
-                    // If no custom icon is provided, fallback to fa-trophy
-                    const achievementIcon = ach.icon || 'fa-trophy';
+        function updateUI() {
+            document.getElementById('coin-count').textContent = formatNumber(gameState.coins);
+            document.getElementById('exp-count').textContent = formatNumber(gameState.exp);
+            document.getElementById('rebirth-counter').textContent = 'Rebirths: ' + gameState.rebirths;
 
-                    // Calculate partial progress if applicable
-                    let progressBarHTML = '';
-                    if (ach.progressKey && ach.goal) {
-                        const current = gameState[ach.progressKey] || 0;
-                        const clamped = Math.min(current, ach.goal);
-                        const percent = (clamped / ach.goal) * 100;
-                        progressBarHTML = `
-              <div class="achievement-progress-container">
-                <div class="achievement-progress-fill" style="width: ${percent}%;"></div>
-              </div>
-              <div class="achievement-progress-text">
-                ${formatNumber(clamped)} / ${formatNumber(ach.goal)}
-              </div>
-            `;
-                    }
-
-                    return `
-            <div 
-              class="achievement-card ${isCompleted ? 'completed' : 'locked'}" 
-              data-id="${ach.id}"
-            >
-              <div class="achievement-top-row">
-                <i class="achievement-icon fas ${achievementIcon}"></i>
-                <div class="achievement-content">
-                  <h4 class="achievement-title">${ach.name}</h4>
-                  <p class="achievement-description">${ach.description || ''}</p>
-                </div>
-                <div class="achievement-status">
-                  <i class="fas ${statusIcon}"></i>
-                </div>
-              </div>
-              ${progressBarHTML}
-            </div>
-          `;
-                })
-                .join('');
+            updateProgressBar();
+            updateUpgradesUI();
         }
 
-        // Check & Unlock Achievements
+        function updateUpgradesUI() {
+            // Some upgrades might have just become unlocked; re-render
+            const container = document.getElementById('upgrades-container');
+            // If you want to preserve the existing upgrades in the DOM, do partial updates
+            // but simpler to just re-render everything:
+            // (We already do re-render in buyUpgrade. But let's do it here too.)
+            renderUpgrades();
+        }
+
+        function formatNumber(num) {
+            if (num < 1000) return num.toFixed(0);
+            const suffixes = ['', 'K', 'M', 'B', 'T'];
+            let suffixIndex = 0;
+            while (num >= 1000 && suffixIndex < suffixes.length - 1) {
+                num /= 1000;
+                suffixIndex++;
+            }
+            return num.toFixed(2) + suffixes[suffixIndex];
+        }
+
         function checkAchievements() {
             achievementsConfig.forEach((ach) => {
                 if (!gameState.achievements[ach.id] && ach.condition(gameState)) {
-                    // Mark achievement as complete
                     gameState.achievements[ach.id] = true;
                     showAchievementPopup(ach);
                 }
             });
-            // Re-render achievements to update UI (grayscale -> color, lock -> check)
             renderAchievements();
+        }
+
+        function renderAchievements() {
+            const container = document.getElementById('achievements-list');
+            container.innerHTML = achievementsConfig
+                .map((ach) => {
+                    const isCompleted = !!gameState.achievements[ach.id];
+                    const statusIcon = isCompleted ? 'fa-check-circle' : 'fa-lock';
+                    const achievementIcon = ach.icon || 'fa-trophy';
+
+                    let progressBarHTML = '';
+                    if (ach.progressKey && ach.goal) {
+                        const currentVal = gameState[ach.progressKey] || 0;
+                        const clamped = Math.min(currentVal, ach.goal);
+                        const percent = (clamped / ach.goal) * 100;
+                        progressBarHTML = `
+                        <div class="achievement-progress-container">
+                            <div class="achievement-progress-fill" style="width: ${percent}%;"></div>
+                        </div>
+                        <div class="achievement-progress-text">
+                            ${formatNumber(clamped)} / ${formatNumber(ach.goal)}
+                        </div>
+                    `;
+                    }
+
+                    return `
+                    <div class="achievement-card ${isCompleted ? 'completed' : 'locked'}" data-id="${ach.id}">
+                        <div class="achievement-top-row">
+                            <i class="achievement-icon fas ${achievementIcon}"></i>
+                            <div class="achievement-content">
+                                <h4 class="achievement-title">${ach.name}</h4>
+                                <p class="achievement-description">${ach.description || ''}</p>
+                            </div>
+                            <div class="achievement-status">
+                                <i class="fas ${statusIcon}"></i>
+                            </div>
+                        </div>
+                        ${progressBarHTML}
+                    </div>
+                `;
+                })
+                .join('');
         }
 
         function showAchievementPopup(achievement) {
@@ -769,34 +1155,31 @@
             popup.querySelector('.popup-description').textContent = achievement.name;
             popup.classList.add('show');
             setTimeout(() => popup.classList.remove('show'), 3000);
+
             confetti({
-                particleCount: 100,
+                particleCount: 80,
                 spread: 70,
                 origin: { y: 0.6 }
             });
         }
 
-        // Leveling & Progress Bar
         function checkLevelUp() {
-            // Example check: 100 EXP * current level to level up
-            if (gameState.exp >= gameState.level * 100) {
-                gameState.exp -= gameState.level * 100;
+            const needed = gameState.level * 100;
+            if (gameState.exp >= needed) {
+                gameState.exp -= needed;
                 gameState.level++;
             }
         }
 
         function updateProgressBar() {
             const expNeeded = gameState.level * 100;
-            const currentExp = gameState.exp % expNeeded;
-            const progress = (currentExp / expNeeded) * 100;
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-
-            progressBar.style.width = `${progress}%`;
-            progressText.textContent = `Level ${gameState.level} - ${Math.floor(progress)}%`;
+            const currentExpInLevel = gameState.exp % expNeeded;
+            const progress = (currentExpInLevel / expNeeded) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-text').textContent =
+                `Level ${gameState.level} - ${Math.floor(progress)}%`;
         }
 
-        // Click Button
         function getClickValue() {
             return 1 * Math.pow(1.5, gameState.upgrades['click-mult'] || 0);
         }
@@ -805,9 +1188,8 @@
             return (gameState.upgrades['auto-click'] || 0) * 1;
         }
 
-        // Animations
         function animatePurchase(id) {
-            const card = document.querySelector(`[data-id="${id}"]`);
+            const card = document.querySelector(`.upgrade-card[data-id="${id}"]`);
             if (!card) return;
             card.animate(
                 [
@@ -819,67 +1201,93 @@
             );
         }
 
-        function createClickParticles() {
-            // Particle animation logic (optional)
-        }
-
-        // Save/Load
         function saveGame() {
             localStorage.setItem('neonClickerSave', JSON.stringify(gameState));
         }
 
         function loadGame() {
-            const save = localStorage.getItem('neonClickerSave');
-            if (save) {
-                gameState = JSON.parse(save);
+            const saved = localStorage.getItem('neonClickerSave');
+            if (saved) {
+                gameState = JSON.parse(saved);
             }
         }
 
-        // Event Listeners
         function setupEventListeners() {
-            // Click
             document.getElementById('click-button').addEventListener('click', () => {
-                gameState.coins += getClickValue();
-                gameState.exp += getClickValue() * 0.2;
+                const clickVal = getClickValue();
+                gameState.coins += clickVal;
+                gameState.exp += clickVal * 0.2;
                 updateUI();
-                createClickParticles();
             });
 
-            // Modal toggles
+            // For modals: settings, achievements, rebirth
             ['settings', 'achievements', 'rebirth'].forEach((type) => {
-                document.getElementById(`${type}-button`).addEventListener('click', () => {
-                    document.getElementById(`${type}-modal`).style.display = 'flex';
-                });
-                document.getElementById(`${type}-modal`).addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) {
-                        e.currentTarget.style.display = 'none';
-                    }
-                });
+                const btn = document.getElementById(`${type}-button`);
+                const modal = document.getElementById(`${type}-modal`);
+                if (btn && modal) {
+                    btn.addEventListener('click', () => {
+                        if (type === 'rebirth') {
+                            updateRebirthModal();
+                        }
+                        modal.style.display = 'flex';
+                    });
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === e.currentTarget) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                }
             });
 
-            // Rebirth confirm button inside modal
             document
                 .getElementById('rebirth-confirm-button')
                 .addEventListener('click', doRebirth);
 
-            // Reset game
             document
                 .getElementById('reset-game-button')
                 .addEventListener('click', resetGame);
+
+            document
+                .getElementById('save-game-button')
+                .addEventListener('click', () => {
+                    saveGame();
+                    alert('Game saved!');
+                });
+        }
+
+        function updateRebirthModal() {
+            const rebirthInfoEl = document.getElementById('rebirth-info');
+            const needed = 100;
+            if (gameState.level >= needed) {
+                rebirthInfoEl.innerHTML = `
+                <p>You have reached Level <span>${gameState.level}</span>, which is enough to Rebirth!</p>
+                <p>Rebirthing will reset your coins, exp, and upgrades, but grant +1 Rebirth.</p>
+            `;
+            } else {
+                const diff = needed - gameState.level;
+                rebirthInfoEl.innerHTML = `
+                <p>You need <span>${diff}</span> more level${diff > 1 ? 's' : ''} to unlock Rebirth.</p>
+                <p>Reach Level 100 to unlock Rebirth!</p>
+            `;
+            }
         }
 
         function doRebirth() {
-            // Simple example: require level 10 to rebirth
-            if (gameState.level >= 10) {
+            const needed = 100;
+            if (gameState.level >= needed) {
                 gameState.rebirths++;
-                // Reset progress
                 gameState.coins = 0;
                 gameState.exp = 0;
                 gameState.level = 1;
                 gameState.upgrades = {};
+                gameState.upgradeCosts = {};
+                initUpgradeCosts();
+                alert('Rebirth successful!');
+                updateUI();
+            } else {
+                alert('You are not high enough level to Rebirth!');
             }
             document.getElementById('rebirth-modal').style.display = 'none';
-            updateUI();
         }
 
         function resetGame() {
@@ -887,7 +1295,6 @@
             location.reload();
         }
 
-        // Initialize
         init();
     </script>
 </body>
