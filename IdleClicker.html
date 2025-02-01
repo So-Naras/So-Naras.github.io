@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js">
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
         :root {
             --primary: #7c3aed;
@@ -1318,6 +1319,10 @@
             animation-delay: 0.6s;
         }
 
+        .update-log-item:nth-child(7) {
+            animation-delay: 0.6s;
+        }
+
         .update-log-item i {
             margin-right: 0.8rem;
             background: linear-gradient(45deg, var(--primary), var(--secondary));
@@ -1513,6 +1518,343 @@
                 opacity: 0;
             }
         }
+
+        /* Planet System Styles */
+        .planet-card {
+            background: linear-gradient(145deg, #363636, #2d2d2d);
+            /* Gray gradient */
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-width: 220px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+
+        .planet-card::before {
+            content: '';
+            position: absolute;
+            background: linear-gradient(45deg,
+                    transparent 20%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    transparent 80%);
+            inset: -2px;
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.3;
+            animation: gradientFlow 4s linear infinite;
+        }
+
+        .planet-card:hover::before {
+            opacity: 0.4;
+        }
+
+        .planet-card:hover .planet-image {
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .planet-rarity {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            background: #4CAF50;
+            /* Default green color */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 12px rgba(76, 175, 80, 0.4);
+            z-index: 2;
+        }
+
+        .planet-rarity.common {
+            background: #6b7280;
+            box-shadow: 0 0 12px rgba(107, 114, 128, 0.4);
+        }
+
+        .planet-rarity.uncommon {
+            background: #22c55e;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+        }
+
+        .planet-rarity.rare {
+            background: #3b82f6;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .planet-rarity.epic {
+            background: #a855f7;
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+        }
+
+        .planet-rarity.legendary {
+            background: #f59e0b;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Orange */
+
+        .planet-rarity {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 700;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .planet-card.common,
+        .planet-card.uncommon,
+        .planet-card.rare,
+        .planet-card.epic,
+        .planet-card.legendary {
+            /* Reset any card-level color modifications */
+            background: linear-gradient(145deg, #3a3a4f, #2a2a3b);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .planet-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            transition: transform 0.6s ease-out;
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.3);
+        }
+
+        .planet-effects {
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .effect-positive {
+            color: #4CAF50;
+        }
+
+        .effect-negative {
+            color: #f44336;
+        }
+
+        #planet-modal .modal-content {
+            max-width: 1000px;
+            background: rgba(40, 32, 72, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.3);
+            align-items: stretch;
+            /* Change from 'center' to 'stretch' */
+            text-align: left;
+        }
+
+        #planet-modal .modal-content::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg,
+                    #7c3aed 0%,
+                    #ff6b6b 50%,
+                    #7c3aed 100%);
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.3;
+            animation: gradientFlow 4s linear infinite;
+            width: 120vw;
+            height: 120vh;
+        }
+
+        .planet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            background: linear-gradient(45deg,
+                    rgba(124, 58, 237, 0.1) 0%,
+                    rgba(255, 107, 107, 0.05) 100%);
+            border-radius: 24px;
+            margin: 1rem;
+            width: 100%;
+        }
+
+        .gacha-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        #gacha-roll-button {
+            background: linear-gradient(45deg,
+                    #7c3aed 0%,
+                    #ff6b6b 100%);
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 16px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.3);
+        }
+
+        #gacha-roll-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg,
+                    transparent 20%,
+                    rgba(255, 255, 255, 0.15) 50%,
+                    transparent 80%);
+            opacity: 0.6;
+            animation: shine 4s infinite;
+        }
+
+        #gacha-roll-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #gacha-roll-button:hover:not(:disabled) {
+            transform: scale(1.05) rotate(2deg);
+            box-shadow: 0 12px 48px rgba(124, 58, 237, 0.5);
+        }
+
+        .active-planet-effects {
+            position: fixed;
+            right: 150px;
+            bottom: 38%;
+            background: linear-gradient(45deg,
+                    rgba(124, 58, 237, 0.15),
+                    rgba(255, 107, 107, 0.1));
+            backdrop-filter: blur(24px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+            max-width: 350px;
+            z-index: 999;
+            /* Remove conflicting transform */
+            transform: none !important;
+            left: auto !important;
+        }
+
+        /* Active Effects Rarity Tag */
+        .active-planet-effects .rarity-tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white !important;
+            margin-left: 0.2rem;
+            vertical-align: middle;
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Rarity-specific Colors for Active Effects */
+        .active-planet-effects .rarity-tag.common {
+            background: #6b7280;
+            box-shadow: 0 0 8px rgba(107, 114, 128, 0.3);
+        }
+
+        .active-planet-effects .rarity-tag.uncommon {
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+        }
+
+        .active-planet-effects .rarity-tag.rare {
+            background: #3b82f6;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .active-planet-effects .rarity-tag.epic {
+            background: #a855f7;
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
+        }
+
+        .active-planet-effects .rarity-tag.legendary {
+            background: #f59e0b;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+        }
+
+
+        .effect-positive,
+        .effect-negative {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin: 0.3rem 0;
+            border-radius: 8px;
+        }
+
+        .effect-positive {
+            background: rgba(76, 175, 80, 0.15);
+            border-left: 4px solid #4CAF50;
+        }
+
+        .effect-negative {
+            background: rgba(244, 67, 54, 0.15);
+            border-left: 4px solid #f44336;
+        }
+
+        .planet-controls {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .rarity-tag {
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .planet-controls-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .planet-controls-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .no-planet {
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 
@@ -1529,6 +1871,9 @@
                 <div class="controls">
                     <div class="control-button" id="rebirth-button">
                         <i class="fas fa-redo-alt"></i>
+                    </div>
+                    <div class="control-button" id="planet-button">
+                        <i class="fas fa-globe"></i>
                     </div>
                     <div class="control-button" id="achievements-button">
                         <i class="fas fa-trophy"></i>
@@ -1611,6 +1956,20 @@
             </div>
         </div>
 
+        <!-- PLANETARY MODAL -->
+        <div id="planet-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Planetary System</h2>
+                <div class="gacha-controls">
+                    <button id="gacha-roll-button" onclick="rollPlanet()">
+                        Cosmic Warp (Cost: 1,000 Coins)
+                    </button>
+                </div>
+                <div class="planet-grid" id="planet-container"></div>
+            </div>
+        </div>
+
+        <div class="active-planet-effects" id="active-effects"></div>
 
         <!-- UPDATE LOG MODAL -->
         <div id="updates-modal" class="modal" style="display: none;">
@@ -1618,15 +1977,49 @@
                 <div class="update-log-sidebar">
                     <h3>Version History</h3>
                     <div class="version-nav">
-                        <button class="version-btn active" data-version="v3">v3.x - Revolution</button>
+                        <button class="version-btn active" data-version="v4">v4.x - Progress</button>
+                        <button class="version-btn" data-version="v3">v3.x - Revolution</button>
                         <button class="version-btn" data-version="v2">v2.x - Evolution</button>
                         <button class="version-btn" data-version="v1">v1.x - Foundation</button>
                     </div>
                 </div>
 
                 <div class="update-log-content">
+                    <!-- v4 Content -->
+                    <div class="version-section v4 active">
+                        <h2 class="version-title">Neon Glass Clicker v4.0</h2>
+                        <div class="update-log-list">
+                            <div class="update-log-item">
+                                <i class="fas fa-globe"></i>Implemented a planetary warp system with custom
+                                buffs/debuffs
+                            </div>
+                            <div class="update-log-item">
+                                <i class="fas fa-bolt"></i>Optimized core engine to improve click response time by 30%
+                            </div>
+                            <div class="update-log-item">
+                                <i class="fas fa-memory"></i>Reduced memory usage by up to 40% for smoother gameplay
+                            </div>
+                            <div class="update-log-item">
+                                <i class="fas fa-tachometer-alt"></i>Enhanced rendering pipeline to achieve consistent
+                                60+ FPS
+                            </div>
+                            <div class="update-log-item">
+                                <i class="fas fa-wind"></i>Introduced lightweight particle systems for better
+                                performance without sacrificing visuals
+                            </div>
+                            <div class="update-log-item">
+                                <i class="fas fa-sync-alt"></i>Revised auto-save system for faster state syncing and
+                                reduced lag
+                            </div>
+                            <div class="update-log-item">
+                                <i class="fas fa-server"></i>Introduced PERFORMANCE MODE to disable particle effects and
+                                enhance operations
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- v3 Content -->
-                    <div class="version-section v3 active">
+                    <div class="version-section v3">
                         <h2 class="version-title">Neon Glass Clicker v3.1</h2>
                         <div class="update-log-list">
                             <div class="update-log-item">
@@ -1783,8 +2176,322 @@
             upgrades: {},
             upgradeCosts: {},
             achievements: {},
-            performanceMode: false
+            performanceMode: false,
+            planets: [],
+            activePlanet: null,
+            rebirthTokens: 0,
+            artifacts: {
+                'stellar-compass': 0,
+                'quantum-crystal': 0,
+                'nebula-core': 0,
+                'chrono-shard': 0
+            },
         };
+
+        const planetConfig = [
+            {
+                id: 'crystalline',
+                name: 'Crystalline World',
+                rarity: 'common',
+                buff: { clickMulti: 1.1 },
+                debuff: { income: 0.95 },
+                icon: 'fa-gem'
+            },
+            {
+                id: 'volcanic',
+                name: 'Volcanic Fury',
+                rarity: 'uncommon',
+                buff: { clickMulti: 1.25, expGain: 1.15 },
+                debuff: { autoClicker: 0.9 },
+                icon: 'fa-fire'
+            },
+            {
+                id: 'gaia',
+                name: 'Gaia Prime',
+                rarity: 'rare',
+                buff: { income: 1.3, clickMulti: 1.15 },
+                debuff: { costMulti: 0.9 },
+                icon: 'fa-leaf'
+            },
+            {
+                id: 'nebulon',
+                name: 'Nebulon Cluster',
+                rarity: 'epic',
+                buff: { clickMulti: 1.5, rebirthBonus: 1.2 },
+                debuff: { achievementRate: 0.8 },
+                icon: 'fa-cloud'
+            },
+            {
+                id: 'singularity',
+                name: 'Quantum Singularity',
+                rarity: 'legendary',
+                buff: { allMulti: 2.0 },
+                debuff: {},
+                icon: 'fa-infinity'
+            },
+            {
+                id: 'aether',
+                name: 'Aetherium Sphere',
+                rarity: 'common',
+                buff: { income: 1.1 },
+                debuff: { clickMulti: 0.95 },
+                icon: 'fa-bullseye'
+            },
+            {
+                id: 'stormforge',
+                name: 'Stormforge Realm',
+                rarity: 'uncommon',
+                buff: { expGain: 1.2, autoClicker: 1.1 },
+                debuff: { clickMulti: 0.9 },
+                icon: 'fa-bolt'
+            },
+            {
+                id: 'frostspire',
+                name: 'Frostspire Shard',
+                rarity: 'rare',
+                buff: { income: 1.4, expGain: 1.1 },
+                debuff: { rebirthBonus: 0.85 },
+                icon: 'fa-snowflake'
+            },
+            {
+                id: 'shadowveil',
+                name: 'Shadowveil Abyss',
+                rarity: 'epic',
+                buff: { clickMulti: 1.6, income: 1.25 },
+                debuff: { expGain: 0.8 },
+                icon: 'fa-moon'
+            },
+            {
+                id: 'solaris',
+                name: 'Solaris Core',
+                rarity: 'legendary',
+                buff: { income: 2.0, rebirthBonus: 1.5 },
+                debuff: {},
+                icon: 'fa-sun'
+            },
+            {
+                id: 'arcane',
+                name: 'Arcane Nexus',
+                rarity: 'common',
+                buff: { expGain: 1.1 },
+                debuff: { income: 0.95 },
+                icon: 'fa-book'
+            },
+            {
+                id: 'mechano',
+                name: 'Mechano Forge',
+                rarity: 'uncommon',
+                buff: { clickMulti: 1.3, autoClicker: 1.2 },
+                debuff: { costMulti: 0.85 },
+                icon: 'fa-cogs'
+            },
+            {
+                id: 'emerald',
+                name: 'Emerald Haven',
+                rarity: 'rare',
+                buff: { expGain: 1.4, rebirthBonus: 1.2 },
+                debuff: { income: 0.9 },
+                icon: 'fa-gem'
+            },
+            {
+                id: 'lunar',
+                name: 'Lunar Bastion',
+                rarity: 'epic',
+                buff: { clickMulti: 1.7, expGain: 1.3 },
+                debuff: { autoClicker: 0.75 },
+                icon: 'fa-globe'
+            },
+            {
+                id: 'eternity',
+                name: 'Eternity Engine',
+                rarity: 'legendary',
+                buff: { allMulti: 2.5 },
+                debuff: {},
+                icon: 'fa-clock'
+            }
+        ];
+
+        const rarityRates = {
+            common: 50,
+            uncommon: 30,
+            rare: 15,
+            epic: 4,
+            legendary: 1
+        };
+
+        function rollPlanet() {
+            if (gameState.coins < 1000) {
+                showNotification('error', 'Not enough coins to roll!');
+                return;
+            }
+
+            gameState.coins -= 1000;
+
+            // Calculate roll
+            const total = Object.values(rarityRates).reduce((a, b) => a + b);
+            let roll = Math.random() * total;
+            let selectedRarity;
+
+            for (const [rarity, chance] of Object.entries(rarityRates)) {
+                if (roll <= chance) {
+                    selectedRarity = rarity;
+                    break;
+                }
+                roll -= chance;
+            }
+
+            // Get random planet of selected rarity
+            const available = planetConfig.filter(p => p.rarity === selectedRarity);
+            const planet = available[Math.floor(Math.random() * available.length)];
+
+            // Add to collection if new
+            if (!gameState.planets.some(p => p.id === planet.id)) {
+                gameState.planets.push(planet);
+                showNotification('success', `Discovered ${planet.name}!`);
+                animatePlanetRoll(planet);
+            } else {
+                showNotification('info', `Duplicate planet: +500 Coins`);
+                gameState.coins += 500;
+            }
+
+            renderPlanets();
+            // animatePlanetRoll(planet);
+            updateUI();
+
+            // Add shimmer effect to modal
+            anime({
+                targets: '#planet-modal .modal-content',
+                duration: 1000,
+                easing: 'easeOutExpo',
+                keyframes: [
+                    { background: ['rgba(255,255,255,0.05)', 'rgba(124,58,237,0.15)'] },
+                    { background: 'rgba(255,255,255,0.05)' }
+                ]
+            });
+        }
+
+        function animatePlanetRoll(planet) {
+            const modal = document.getElementById('planet-modal');
+            const tempPlanet = document.createElement('div');
+            tempPlanet.className = `planet-card ${planet.rarity}`;
+            tempPlanet.innerHTML = `
+        <div class="planet-image">
+            <i class="fas ${planet.icon}"></i>
+        </div>
+        <div class="planet-rarity ${planet.rarity}">${planet.rarity}</div>
+        <h3>${planet.name}</h3>
+    `;
+
+            tempPlanet.style.transform = 'scale(0)';
+            tempPlanet.style.opacity = '0';
+            modal.querySelector('.planet-grid').appendChild(tempPlanet);
+
+            anime({
+                targets: tempPlanet,
+                scale: [0, 1],
+                opacity: [0, 1],
+                duration: 1000,
+                easing: 'spring(1, 80, 10, 0)'
+            });
+        }
+
+        function renderPlanets() {
+            const container = document.getElementById('planet-container');
+            container.innerHTML = '';
+
+            gameState.planets.forEach(planet => {
+                const card = document.createElement('div');
+                card.className = `planet-card ${planet.rarity}`;
+                card.innerHTML = `
+            <div class="planet-image">
+                <i class="fas ${planet.icon}"></i>
+            </div>
+            <div class="planet-rarity ${planet.rarity}">${planet.rarity}</div>
+            <h3>${planet.name}</h3>
+            <div class="planet-effects">
+                ${Object.entries(planet.buff).map(([key, val]) =>
+                    `<div class="effect-positive">+${(Math.round((val - 1) * 100))}% ${key}</div>`
+
+                ).join('')}
+                ${Object.entries(planet.debuff).map(([key, val]) =>
+                    `<div class="effect-negative">-${(Math.round((1 - val) * 100))}% ${key}</div>`
+                ).join('')}
+            </div>
+        `;
+
+                card.addEventListener('click', () => activatePlanet(planet));
+                container.appendChild(card);
+            });
+
+            updateActiveEffects();
+        }
+
+        function activatePlanet(planet) {
+            if (!planet) {
+                gameState.activePlanet = null;
+                showNotification('info', 'Planet effect removed');
+            } else {
+                gameState.activePlanet = planet;
+                showNotification('success', `${planet.name} activated!`);
+            }
+            updateActiveEffects();
+            saveGame();
+        }
+
+        function updateActiveEffects() {
+            const container = document.getElementById('active-effects');
+            container.innerHTML = '';
+
+            if (!gameState.activePlanet) {
+                container.innerHTML = `
+            <div class="no-planet">No active planet</div>
+            <button class="planet-controls-btn" onclick="showPlanetModal()">
+                <i class="fas fa-globe"></i> Choose Planet
+            </button>
+        `;
+                return;
+            }
+
+            const p = gameState.activePlanet;
+            container.innerHTML = `
+        <h4>${p.name} <span class="rarity-tag ${p.rarity}">${p.rarity}</span></h4>
+        ${Object.entries(p.buff).map(([k, v]) => `
+            <div class="effect-positive">
+                <i class="fas fa-arrow-up"></i>
+                <div>+${Math.round((v - 1) * 100)}% ${k}</div>
+            </div>
+        `).join('')}
+        ${Object.entries(p.debuff).map(([k, v]) => `
+            <div class="effect-negative">
+                <i class="fas fa-arrow-down"></i>
+                <div>-${Math.round((1 - v) * 100)}% ${k}</div>
+            </div>
+        `).join('')}
+        <div class="planet-controls">
+            <button class="planet-controls-btn" onclick="activatePlanet(null)">
+                <i class="fas fa-times"></i> Remove
+            </button>
+            <button class="planet-controls-btn" onclick="showPlanetModal()">
+                <i class="fas fa-sync"></i> Change
+            </button>
+        </div>
+    `;
+        }
+
+        function showPlanetModal() {
+            const modal = document.getElementById('planet-modal');
+            modal.style.display = 'flex';
+            renderPlanets();
+
+            // Add entrance animation
+            anime({
+                targets: modal.querySelector('.planet-card'),
+                opacity: [0, 1],
+                translateY: [50, 0],
+                delay: anime.stagger(100),
+                easing: 'spring(1, 80, 10, 0)'
+            });
+        }
 
         // Upgrades Config
         // We have a chain: time-machine => once time-machine >= 10, hide time-machine, show mega-click
@@ -2053,6 +2760,7 @@
             setupEventListeners();
             updateUI();
             startGameLoop();
+            updateActiveEffects();
         }
 
         function initUpgradeCosts() {
@@ -2425,11 +3133,14 @@
 
         // Click Gains
         function getClickValue() {
-            // base click of 1, multiplied by (rebirths + 1), 
-            // multiplied by 1.5^(clickMult level):
-            const baseClick = 1;
-            const clickMultLevel = gameState.upgrades['click-mult'] || 0;
-            return (gameState.rebirths + 1) * baseClick * Math.pow(1.5, clickMultLevel);
+            let base = (gameState.rebirths + 1) * Math.pow(1.5, gameState.upgrades['click-mult'] || 0);
+            if (gameState.activePlanet?.buff.clickMulti) {
+                base *= gameState.activePlanet.buff.clickMulti;
+            }
+            if (gameState.activePlanet?.buff.allMulti) {
+                base *= gameState.activePlanet.buff.allMulti;
+            }
+            return base;
         }
 
         function getAutoIncome() {
@@ -2474,6 +3185,17 @@
                 gameState.coins += val;
                 gameState.exp += val * 0.2;
                 updateUI();
+            });
+
+            document.getElementById('planet-button').addEventListener('click', () => {
+                document.getElementById('planet-modal').style.display = 'flex';
+                renderPlanets();
+            });
+
+            document.getElementById('planet-modal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    document.getElementById('planet-modal').style.display = 'none';
+                }
             });
 
             document.getElementById('performance-mode-button').addEventListener('click', () => {
@@ -2557,6 +3279,9 @@
         function doRebirth() {
             const needed = 100;
             if (gameState.level >= needed) {
+                const newRebirths = gameState.rebirths + 1;
+                gameState.rebirthTokens += newRebirths * newRebirths; // n² tokens
+                gameState.rebirths = newRebirths;
                 gameState.rebirths++;
                 gameState.coins = 0;
                 gameState.exp = 0;
@@ -2574,7 +3299,12 @@
 
         function resetGame() {
             localStorage.removeItem('neonClickerSave');
-            location.reload();
+            gameState.activePlanet = null;
+            // Force immediate UI update before reload
+            updateActiveEffects();
+            requestAnimationFrame(() => {
+                location.reload();
+            });
         }
 
         function init() {
@@ -2585,6 +3315,7 @@
             setupEventListeners();
             updateUI();
             startGameLoop();
+            updateActiveEffects();
         }
 
         init();
